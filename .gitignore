@@ -1,0 +1,7 @@
+.project
+.pydevproject
+.settings/
+__pycache__/
+*\.pyc
+**/*.sw[po]
+
