@@ -3,7 +3,7 @@
 
 from common import utils, logging
 from common.utils import in_kwargs
-from L1.iprogram import IProgram
+from L1.common.iprogram import IProgram
 from common.res import SearchRes
 from enum import Enum
 import itertools

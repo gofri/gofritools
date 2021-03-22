@@ -2,7 +2,7 @@
 # encoding: utf-8
 from common import utils, logging
 from L1.common.argparse import FileLine
-from L1.iprogram import IProgram
+from L1.common.iprogram import IProgram
 from L1.common.argparse import common_file_line_parser
 
 class Delete(IProgram):

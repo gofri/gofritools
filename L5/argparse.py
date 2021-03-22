@@ -5,7 +5,7 @@ from L1.common.argparse import FileLine
 from common import utils
 from L1.select import Select
 from common.argparse import general_purpose_parser
-from L1.program_factory import ProgramFactory
+from L1.common.program_factory import ProgramFactory
 
 ''' DEPRECATED: started moving to each prog '''
 def add_sub_parser(p, kv_dict, /, *args, aliases, **kwargs):

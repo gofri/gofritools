@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
-from L1.iprogram import IProgram
+from L1.common.iprogram import IProgram
 from common import logging
 
 

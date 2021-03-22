@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from common import utils, ui_tools, logging
-from L1.iprogram import IProgram
+from L1.common.iprogram import IProgram
 from common.res import SearchRes
 from L1.common.argparse import common_pattern_parser
 
