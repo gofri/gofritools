@@ -94,8 +94,10 @@ main() {
 		echo "${UTIL_NAME} i f \"\$@\"" > ff
 		echo "$start_script || $resume_script" > gof-start
 		echo "$__exec_script bash -c '(cd /gofritools && git pull)'" > gof-update
+		echo "$__exec_script bash -c '(cd /gofritools && git fetch && git reset --hard origin/master)'" > gof-force-update
+		echo "$__exec_script bash" > gof-enter
 
-		chmod +x gof gofi gg ff gof-start gof-update
+		chmod +x gof gofi gg ff gof-start gof-update gof-force-update gof-enter
 	)
 
 	# Kick-off
