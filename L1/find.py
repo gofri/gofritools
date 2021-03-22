@@ -40,7 +40,8 @@ class Find(IProgram):
         matches = self.__remove_leading_cur_dir(matches)
         matches = utils.unify_paths(matches)
 
-        res = SearchRes([SearchRes.Record(path=match) for match in matches])
+        res = SearchRes.from_list([{'path':match} for match in matches])
+
         return res
 
     def __get_files_to_search(self, files):

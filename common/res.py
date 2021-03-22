@@ -11,80 +11,79 @@ from common.git.types import Repo
 class IRes(ABC):
     pass
 
+class Record(object):
+    def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
+        self.path = path or ''
+        self.line = line and int(line) or ''
+        self.text = text or ''
+        self.text_colored = text_colored or ''
+        if caller:
+            c_line, c_text = caller
+            self.caller = int(c_line), c_text
+        else:
+            self.caller = (0, '')
+        self.pre_ctx = pre_ctx or []
+        self.post_ctx = post_ctx or []
+        self.is_decl = is_decl
+
+    @classmethod
+    def default_of(cls, d):
+        return cls().get(d)
+
+    def get(self, key, default=None):
+        try:
+            return vars(self)[key]
+        except Exception as e:
+            return default
+
+    @classmethod
+    def from_dict(cls, d):
+        return Record(**d)
+
+    def trim(self):
+        self.text = self.text.strip()
+        self.text_colored = self.text_colored.strip()
+
+    def keep_only(self, elements, trim_on_sort=True):
+        self.assert_has_elements(elements)
+        new_dict = {}
+        for k, v in self.__dict__.items():
+            if k in elements:
+                new_dict[k] = v
+            else:
+                new_dict[k] = self.default_of(k)
+        self.__dict__ = new_dict
+
+    def jsonize(self):
+        return utils.jsonize(self.__dict__)
+
+    def humanize(self, i, **kwargs):
+        return Stringification.stringify_record(i, self.__dict__, **kwargs)
+
+    def raw_text(self, i, **kwargs):
+        return self.humanize(i, colored=False, **kwargs)
+
+    def stringify_by_args(self, **kwargs):
+        return Stringification.stringify_by_args(self, **kwargs)
+
+    def assert_has_elements(self, elements):
+        assert self.has_elements(
+            elements), f'One or more invalid element: {elements}'
+
+    def has_elements(self, elements):
+        class NotFound:
+            pass
+        for d in elements:
+            if self.get(d, NotFound) == NotFound:
+                return False
+        return True
+
 
 class SearchRes(IRes):
 
     # TODO The rest of the SearchRes code is below, move Record outa here.
     def __init__(self, records=None):
         self._records = records or []
-
-    class Record(object):
-        def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
-            self.path = path or ''
-            self.line = line and int(line) or ''
-            self.text = text or ''
-            self.text_colored = text_colored or ''
-            if caller:
-                c_line, c_text = caller
-                self.caller = int(c_line), c_text
-            else:
-                self.caller = (0, '')
-            self.pre_ctx = pre_ctx or []
-            self.post_ctx = post_ctx or []
-            self.is_decl = is_decl
-
-        @classmethod
-        def default_of(cls, d):
-            return cls().get(d)
-
-        def get(self, key, default=None):
-            try:
-                return vars(self)[key]
-            except Exception as e:
-                return default
-
-        @classmethod
-        def from_dict(cls, d):
-            return cls.Record(**d)
-
-        def trim(self):
-            self.text = self.text.strip()
-            self.text_colored = self.text_colored.strip()
-
-        def keep_only(self, elements, trim_on_sort=True):
-            self.assert_has_elements(elements)
-            new_dict = {}
-            for k, v in self.__dict__.items():
-                if k in elements:
-                    new_dict[k] = v
-                else:
-                    new_dict[k] = self.default_of(k)
-            self.__dict__ = new_dict
-
-        def jsonize(self):
-            return utils.jsonize(self.__dict__)
-
-        def humanize(self, i, **kwargs):
-            return Stringification.stringify_record(i, self.__dict__, **kwargs)
-
-        def raw_text(self, i, **kwargs):
-            return self.humanize(i, colored=False, **kwargs)
-
-        def stringify_by_args(self, **kwargs):
-            return Stringification.stringify_by_args(self, **kwargs)
-
-        def assert_has_elements(self, elements):
-            assert self.has_elements(
-                elements), f'One or more invalid element: {elements}'
-
-        def has_elements(self, elements):
-            class NotFound:
-                pass
-            for d in elements:
-                if self.get(d, NotFound) == NotFound:
-                    return False
-            return True
-
     @property
     def records(self):
         return self._records
@@ -106,7 +105,7 @@ class SearchRes(IRes):
         return len(self._records)
 
     def add_record(self, *args, **kwargs):
-        r = self.Record(*args, **kwargs)
+        r = Record(*args, **kwargs)
         if (path := utils.should_ignore_record(r)):
             logging.verbose_print(f'Ignoring record with path: {path}')
             return
@@ -114,7 +113,7 @@ class SearchRes(IRes):
 
     @classmethod
     def from_list(cls, l):
-        records = [cls.Record.from_dict(d) for d in l]
+        records = [Record.from_dict(d) for d in l]
         return SearchRes(records)
 
     def keep_indices(self, indices, to_omit=None):
@@ -141,7 +140,7 @@ class SearchRes(IRes):
             def sort_func(r):
                 new = []
                 for d in elements:
-                    s = r.get(d, self.Record.default_of(d))
+                    s = r.get(d, Record.default_of(d))
                     if isinstance(s, str) and trim_on_sort:
                         s = s.strip()
                     new.append(s)
