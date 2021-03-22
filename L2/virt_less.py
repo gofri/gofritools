@@ -2,7 +2,7 @@
 # encoding: utf-8
 from L2.ivirt import IVirt
 from L1.less import Less
-from common.argparse import FileLine
+from L1.common.argparse import FileLine
 
 class VirtLess(IVirt):
     def __init__(self, *args, **kwargs):

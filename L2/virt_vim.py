@@ -2,7 +2,7 @@
 # encoding: utf-8
 from L2.ivirt import IVirt
 from L1.vim import Vim
-from common.argparse import FileLine
+from L1.common.argparse import FileLine
 
 class VirtVim(IVirt):
     def __init__(self, *args, **kwargs):
