@@ -6,7 +6,7 @@ import sys
 
 from common import utils
 from L4.stack import Stack
-from L5.opmode_factory import OpModeFactory
+from L5.common.opmode_factory import OpModeFactory
 
 def collect_stdin():
     ''' Collect existing stack from stdin -- default to empty stack. '''

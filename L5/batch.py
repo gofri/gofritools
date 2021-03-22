@@ -1,4 +1,4 @@
-from L5.iopmode import IOpMode
+from L5.common.iopmode import IOpMode
 from common import logging, ui_tools, utils
 import sys
 
