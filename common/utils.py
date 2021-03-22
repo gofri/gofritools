@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
+import sys
 import json
 import os
 import importlib
@@ -216,3 +217,11 @@ class OutputTypes(Enum):
 
 def is_pipe(fp):
     return not fp.isatty()
+
+class NoPipe(Exception): pass
+def collect_bin_stdin():
+    if not is_pipe(sys.stdin):
+        raise NoPipe()
+
+    return utils.depicklize_file(sys.stdin.buffer)
+

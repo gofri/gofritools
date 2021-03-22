@@ -2,24 +2,16 @@
 # encoding: utf-8
 # PYTHON_ARGCOMPLETE_OK
 
-import sys
-
-from common import utils
-from L4.stack import Stack
+from L4.common.stack_factory import StackFactory
 from L5.common.opmode_factory import OpModeFactory
 
-def collect_stdin():
-    ''' Collect existing stack from stdin -- default to empty stack. '''
-    if not utils.is_pipe(sys.stdin):
-        return Stack()
-
-    return utils.depicklize_file(sys.stdin.buffer)
 ###
 
 def main():
-    stack = collect_stdin()
+    stack = StackFactory().create()
     mode = OpModeFactory(stack).create()
     mode.run()
 
 if 'main' in __name__:
+    import sys
     sys.exit(main())
