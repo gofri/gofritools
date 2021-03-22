@@ -76,6 +76,6 @@ def common_pattern_parser():
 def common_file_line_parser():
     common_file_line = argparse.ArgumentParser(add_help=False)
     common_file_line.add_argument(
-        'pairs', help='One or more [file]s or [file,line] pairs', type=FileLine.from_str, nargs="?")
+        'pairs', help='One or more [file]s or [file,line] pairs', type=FileLine.from_str, nargs="*")
 
     return common_file_line
