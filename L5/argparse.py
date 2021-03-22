@@ -28,10 +28,8 @@ def mode_parser(parser):
     subparsers = parser.add_subparsers(dest='mode')
     parsers = {}
 
-    parsers['interactive'] = add_mode_parser(subparsers, 
-        'interactive', aliases=['i'], parents=[], help='Interactive mode')
-    parsers['batch'] = add_mode_parser(subparsers, 
-        'batch', aliases=['b'], parents=[], help='Batch mode')
+    for p in ('interactive', 'batch'):
+        parsers[p] = add_mode_parser(subparsers, p, aliases=[p[0]], help=f'{p.capitalize()} mode')
 
     return parsers
 
@@ -39,25 +37,6 @@ def add_commands_parser(parser, interactive, virt, required):
     # TODO interactive/virt ==> will move naturally when each layer exports its argparse
     subparsers = parser.add_subparsers(dest='command')
 
-    # Grep-specific
-
-    # Find-specific
-
-    # Vim-specific
-
-    # Less-specific
-
-    # Replace-specific
-
-    # Difftool-specific
-
-    # Copy-specific
-
-    # Trim-specific
-
-    # Select-specific
-
-    # Element-specific
     ProgramFactory.arg_parser(subparsers)
 
     # INTERACTIVE-DEPENDENT
