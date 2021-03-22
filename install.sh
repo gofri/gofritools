@@ -88,7 +88,7 @@ main() {
 	(
 		cd $INSTALL_DIR
 		echo "$exec_script" > "${UTIL_NAME}"
-		echo "${UTIL_NAME} \"\$@\"" > gof
+		echo "${UTIL_NAME} b \"\$@\"" > gof
 		echo "${UTIL_NAME} i \"\$@\"" > gofi
 		echo "${UTIL_NAME} i g \"\$@\"" > gg
 		echo "${UTIL_NAME} i f \"\$@\"" > ff
