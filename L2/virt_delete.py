@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
-from L2.ivirt import IVirt
+from L2.common.ivirt import IVirt
 from L1.delete import Delete
 from L1.common.argparse import FileLine
 

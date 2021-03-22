@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
-from L2.ivirt import IVirt
+from L2.common.ivirt import IVirt
 from L1.copy import Copy
 from common.stringification import Stringification
 from common import utils
