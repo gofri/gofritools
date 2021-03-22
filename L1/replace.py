@@ -3,6 +3,7 @@
 from common import utils
 from L1.iprogram import IProgram
 from common.argparse import FileLine
+from L1.common.argparse import common_file_line_parser
 
 
 class Replace(IProgram):
@@ -16,3 +17,14 @@ class Replace(IProgram):
 
     def escape(self, s): 
         return s.replace('/', '\/')
+
+    @classmethod
+    def arg_parser(cls, parent):
+        replace_parser = cls._add_command_parser(parent, 'replace', aliases=['r'], parents=[common_file_line_parser()],
+            help='replace text with other text (sed-based)')
+        replace_parser.add_argument('before', help='pattern to search', type=str)
+        replace_parser.add_argument(
+            'after', help='pattern to set isntead', type=str)
+        replace_parser.add_argument('-G', '--no-global-replace', dest='global_replace', default=True,
+                                    help='disable global replace (enabled by default)', action='store_false')
+

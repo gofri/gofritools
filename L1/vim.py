@@ -3,7 +3,7 @@
 from common import utils
 from L1.iprogram import IProgram
 import argparse
-
+from L1.common.argparse import common_file_line_parser
 
 class Vim(IProgram):
     def _run_prog(self, pairs, view_mode):
@@ -36,3 +36,10 @@ class Vim(IProgram):
 
     def __fix_default_line(self, line):
         return line or '0'
+
+    @classmethod
+    def arg_parser(cls, parent):
+        vim_parser = cls._add_command_parser(parent, 
+            'vim', aliases=['v'], parents=[common_file_line_parser()], help='Open file in vim')
+        vim_parser.add_argument('-v', '--view-mode', help='Choose view mode',
+                                choices=['c', 'combo', 's', 'series'], default='combo')

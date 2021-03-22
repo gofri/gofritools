@@ -4,6 +4,7 @@
 from common import utils, ui_tools, logging
 from L1.iprogram import IProgram
 from common.res import SearchRes
+from L1.common.argparse import common_pattern_parser
 
 
 class Find(IProgram):
@@ -50,3 +51,14 @@ class Find(IProgram):
 
     def __remove_leading_cur_dir(self, paths):
         return [path[2:] if path.startswith('./') else path for path in paths]
+
+
+    @classmethod
+    def arg_parser(cls, parent):
+        find_parser = cls._add_command_parser(parent, 'find', aliases='f', parents=[
+                                            common_pattern_parser()], help='find operations')
+        suffix_options = find_parser.add_mutually_exclusive_group()
+        suffix_options.add_argument('-s', '--suffix', nargs='*', type=str, help='File extension (e.g. cpp, py)', default=[
+                                    'py', 'c', 'cpp', 'cc', 'h', 'hpp', 'java', 'md', 'jinja', 'jinja2', 'json', 'rpm', 'sh', 'text', 'txt', 'go', 'js'])
+        suffix_options.add_argument(
+            '-S', '--no-suffix', action='store_false', dest='suffix', help='No file extension')

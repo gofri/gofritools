@@ -102,3 +102,12 @@ class Select(IProgram):
             r = [cls.UNSELECT_SPECIAL_CHAR] + r
 
         return r
+
+    @classmethod
+    def arg_parser(cls, parent):
+        select_parser = cls._add_command_parser(parent, 'select', aliases='s', parents=[
+        ], help='Select multiple ranges of a list by indices')
+        select_parser.add_argument(
+            'ranges', help='list of space separated row indices (N) or index ranges (N1-N2)', type=Select.RangeType, nargs='+')
+        select_parser.add_argument(
+            '--data-list', help='The list to operate on', nargs="+", default=[])

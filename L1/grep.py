@@ -8,6 +8,7 @@ from common.res import SearchRes
 from enum import Enum
 import itertools
 from L0.ishell import IShell
+from L1.common.argparse import common_pattern_parser
 
 GREP_RC_NO_RES = 1
 
@@ -92,6 +93,28 @@ class Grep(IProgram):
 
     def __parse_output(self, output, output_colored, *args, **kwargs):
         return Parsing().parse_with_func_ctx(output, output_colored)
+
+    @classmethod
+    def arg_parser(cls, parent):
+        grep_parser = cls._add_command_parser(parent, 'grep', aliases='g', parents=[
+                                            common_pattern_parser()], help='grep operations (note: searches git repo by default)')
+        grep_parser.add_argument(
+            '-w', '--whole-word', help='grep for whole word', action='store_true', default=False)
+        inputs = grep_parser.add_mutually_exclusive_group()
+        inputs.add_argument('-g', '--git', help='Search files within the git repo',
+                            action='store_true', dest='git', default=True)
+        inputs.add_argument(
+            '-G', '--no-git', help='Do not search within git repo', action='store_false', dest='git')
+        inputs.add_argument('-t', '--untracked', help='When searching git, search untracked files',
+                            action='store_true')
+        inputs.add_argument(
+            '--text', help='Grep text rather than files - input from this flag', type=str, default=None)
+        inputs.add_argument('-p', '--context', help='Grab context for the result (works for c files)', action='store_true', dest='context', default=True)
+        inputs.add_argument('-P', '--no-context', help='DO NOT grab context for the result', action='store_false', dest='context')
+        grep_parser.add_argument('--exclude-files', nargs='*', type=str,
+                                 help='file patterns to exclude', default=['*.pdf'])  # Breaks encoding
+        grep_parser.add_argument(
+            '-v', '--invert', action='store_true', help='invert match (like grep -v)')
 
 class InlineSeparator(Enum):
     CALLER = '='

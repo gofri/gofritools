@@ -4,7 +4,7 @@
 from abc import abstractmethod
 from common import utils, res
 from common.utils import SimpleCache
-
+from common.argparse import add_sub_parser
 
 class IProgram(object):
     def __init__(self, ishell):
@@ -26,6 +26,15 @@ class IProgram(object):
     @abstractmethod
     def _run_prog(self, **kwargs):
         pass
+
+    @classmethod
+    @abstractmethod
+    def arg_parser(cls, parent):
+        pass
+
+    @classmethod
+    def _add_command_parser(cls, p, name, /, *args, aliases, **kwargs):
+        return add_sub_parser(p, {'command':name}, *args, aliases=aliases, **kwargs)
 
     @classmethod
     def filter_prog_args(cls, prog, kwargs):
