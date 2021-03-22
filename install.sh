@@ -1,5 +1,5 @@
 DOCKERHUB_IMAGE="galmenash/gofritools"
-IMAGE_NAME="${IMAGE_NAME:-gofritools-image}"
+IMAGE_NAME="${IMAGE_NAME:-${DOCKERHUB_IMAGE}}"
 CONTAINER_NAME="${CONTAINER_NAME:-gofritools}"
 INSTALL_DIR="${INSTALL_DIR:-$(realpath ~/.local/bin)}"
 UTIL_NAME="${UTIL_NAME:-gofritools}"
