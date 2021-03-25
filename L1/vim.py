@@ -3,7 +3,7 @@
 from common import utils
 from L1.common.iprogram import IProgram
 import argparse
-from L1.common.argparse import common_file_line_parser
+from L1.common.argparse import common_file_line_parser, FileLine
 
 class Vim(IProgram):
     def _run_prog(self, pairs, view_mode):
@@ -26,6 +26,7 @@ class Vim(IProgram):
                 self.ishell.interactive_cmd(['vim'] + args)
 
             elif view_mode in ('s', 'series'):
+                pairs = FileLine.as_safe_list(pairs)
                 for p in pairs:
                     print(
                         f'Showing {p} | Press enter to continue, s/stop to stop')
