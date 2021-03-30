@@ -1,4 +1,4 @@
-from L3.common.ipipe import IPipe
+from L3.lower.ipipe import IPipe
 from common.res import SearchRes
 
 

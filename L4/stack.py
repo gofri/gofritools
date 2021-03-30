@@ -1,5 +1,5 @@
 from L4.common.istack import IStack
-from L3.common.pipe_factory import PipeFactory
+from L3.upper.pipe_factory import PipeFactory
 from L3.nullpipe import NullPipe
 from common.res import SearchRes
 from common import utils
