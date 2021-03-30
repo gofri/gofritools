@@ -2,7 +2,7 @@
 # encoding: utf-8
 # PYTHON_ARGCOMPLETE_OK
 
-from L4.common.stack_factory import StackFactory
+from L4.upper.stack_factory import StackFactory
 from L5.common.opmode_factory import OpModeFactory
 
 ###
