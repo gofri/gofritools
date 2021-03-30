@@ -6,7 +6,6 @@ import argparse
 from L1.common.argparse import common_file_line_parser
 
 
-# TODO complete code duplicate with vim
 class Less(IProgram):
     def _run_prog(self, pairs):
         assert len(pairs) > 0, "empty file selection for less"
