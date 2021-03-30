@@ -3,7 +3,7 @@ import argparse as pyargparse
 
 from common import logging, ui_tools, utils
 from L4.stack import Stack
-from L5.common.iopmode import IOpMode
+from L5.lower.iopmode import IOpMode
 from L5 import argparse
 
 class InteractiveMode(IOpMode):
