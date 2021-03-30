@@ -2,9 +2,9 @@
 # encoding: utf-8
 
 from common import utils, ui_tools, logging
-from L1.common.iprogram import IProgram
+from L1.lower.iprogram import IProgram
 from common.res import SearchRes
-from L1.common.argparse import common_pattern_parser
+from L1.lower.argparse import common_pattern_parser
 
 
 class Find(IProgram):

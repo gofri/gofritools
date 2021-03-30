@@ -9,7 +9,7 @@ from L2.virt_delete import VirtDelete
 from L2.virt_copy import VirtCopy
 from L2.virt_select import VirtSelect
 from L2.virt_trim import VirtTrim
-from L1.common.program_factory import ProgramFactory
+from L1.upper.program_factory import ProgramFactory
 from L2.virt_element import VirtElement
 from L2.virt_difftool import VirtDifftool
 

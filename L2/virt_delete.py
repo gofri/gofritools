@@ -2,7 +2,7 @@
 # encoding: utf-8
 from L2.common.ivirt import IVirt
 from L1.delete import Delete
-from L1.common.argparse import FileLine
+from L1.lower.argparse import FileLine
 
 class VirtDelete(IVirt):
     def __init__(self, *args, **kwargs):

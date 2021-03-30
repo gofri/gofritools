@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-from L1.common.iprogram import IProgram
+from L1.lower.iprogram import IProgram
 from abc import abstractmethod
 from common import utils
 from common.utils import SimpleCache

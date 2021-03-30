@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 # encoding: utf-8
 from common import utils
-from L1.common.iprogram import IProgram
+from L1.lower.iprogram import IProgram
 import argparse
-from L1.common.argparse import common_file_line_parser, FileLine
+from L1.lower.argparse import common_file_line_parser, FileLine
 
 class Vim(IProgram):
     def _run_prog(self, pairs, view_mode):

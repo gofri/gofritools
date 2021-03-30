@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
-from L1.common.iprogram import IProgram
+from L1.lower.iprogram import IProgram
 import argparse
 import itertools
 from enum import Enum, auto

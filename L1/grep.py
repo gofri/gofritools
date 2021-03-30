@@ -3,12 +3,12 @@
 
 from common import utils, logging
 from common.utils import in_kwargs
-from L1.common.iprogram import IProgram
+from L1.lower.iprogram import IProgram
 from common.res import SearchRes
 from enum import Enum
 import itertools
 from L0.ishell import IShell
-from L1.common.argparse import common_pattern_parser
+from L1.lower.argparse import common_pattern_parser
 
 GREP_RC_NO_RES = 1
 
