@@ -1,5 +1,5 @@
 from L3.common.ipipe import IPipe
-from L2.common.virt_factory import VirtFactory
+from L2.upper.virt_factory import VirtFactory
 
 
 class Pipe(IPipe):
