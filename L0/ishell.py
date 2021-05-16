@@ -41,7 +41,7 @@ class IShell(ABC):
         return res['rc'] == cls.INTERNAL_ERROR_RES
 
     class CmdFailureException(Exception):
-        def __init__(self, res, cwd, *args, **kwargs):
+        def __init__(self, res, cmd, *args, **kwargs):
             super().__init__(res, *args, **kwargs)
             self.res = res
-            self.cwd = cwd
+            self.cmd = cmd

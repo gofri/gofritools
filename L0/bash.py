@@ -47,10 +47,10 @@ class Bash(IShell):
         with open('/dev/tty', 'r') as tty_stdin:
             res = subprocess.call(cmd, stdin=tty_stdin)
         if must_work and res != self.POSIX_SUCCESS:
-            raise IShell.CmdFailureException(res)
+            raise IShell.CmdFailureException(res, cmd)
 
     def run_on_shell(self, cmd_str, must_work=True):
         logging.verbose_print(f'running shell cmd: {cmd_str}')
         res = subprocess.call(cmd_str, encoding='utf8', shell=True)
         if must_work and res != self.POSIX_SUCCESS:
-            raise IShell.CmdFailureException(res)
+            raise IShell.CmdFailureException(res, cmd_str)
