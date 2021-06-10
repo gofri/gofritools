@@ -19,7 +19,7 @@ try_install_docker() {
 }
 
 get_installed_engine() {
-	if grep -qi 'red hat' /etc/os-release; then
+	if grep -qi -e 'red hat' -e 'centos' -e 'fedora' /etc/os-release; then
 		# rhel enable you to install both but always uses podman, which is fucked up.
 		which podman && return 0
 	fi
