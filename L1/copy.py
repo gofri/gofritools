@@ -19,6 +19,6 @@ class Copy(IProgram):
         copy_parser = cls._add_command_parser(parent, 
             'copy', aliases=['c'], parents=[], help='Copy the output')
         copy_parser.add_argument('-s', '--selection', help='copy type',
-                                 default='clip-board', choices=['primary', 'secondary', 'clip-board'])
+                                 default='clipboard', choices=['primary', 'secondary', 'clipboard'])
         copy_parser.add_argument('-t', '--text', help='text to copy', default='')
         copy_parser.add_argument('-x', '--xargs', help='xargs (replace line-break with space)', action='store_true', default=False)
