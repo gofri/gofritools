@@ -63,13 +63,10 @@ main() {
 		IMAGE_NAME=${DOCKERHUB_IMAGE}
 	else
 		echo "Failed to pull -- let's build;"
-		if test "$engine" = "docker"; then
-			if test $PULL_REPO -eq 1; then
-				$engine build --no-cache -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
-			else
-				$engine build --no-cache -t "${IMAGE_NAME}"
-			fi
-			
+		if test $PULL_REPO -eq 0; then
+			$engine build --no-cache -t "${IMAGE_NAME}" .
+		elif test "$engine" = "docker"; then
+			$engine build --no-cache -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
 		else
 			tmpdir=$(mktemp -d)
 			(
