@@ -7,7 +7,7 @@ UTIL_NAME="${UTIL_NAME:-gofritools}"
 REPO="${REPO:-https://github.com/gofri/gofritools.git}"
 BRANCH="${BRANCH:-master}"
 PULL_DOCKERHUB=${PULL_DOCKERHUB:-1}
-
+PULL_REPO=${PULL_REPO:-1}
 
 try_install_docker() {
 	if grep -qi 'red hat' /etc/os-release; then
@@ -64,7 +64,12 @@ main() {
 	else
 		echo "Failed to pull -- let's build;"
 		if test "$engine" = "docker"; then
-			$engine build --no-cache -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
+			if test $PULL_REPO -eq 1; then
+				$engine build --no-cache -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
+			else
+				$engine build --no-cache -t "${IMAGE_NAME}"
+			fi
+			
 		else
 			tmpdir=$(mktemp -d)
 			(
