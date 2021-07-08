@@ -6,6 +6,7 @@ UTIL_NAME="${UTIL_NAME:-gofritools}"
 
 REPO="${REPO:-https://github.com/gofri/gofritools.git}"
 BRANCH="${BRANCH:-master}"
+PULL_DOCKERHUB=${PULL_DOCKERHUB:-1}
 
 
 try_install_docker() {
@@ -58,7 +59,7 @@ main() {
 	$engine rmi ${IMAGE_NAME}
 
 	# Build
-	if ${engine} pull ${DOCKERHUB_IMAGE}:latest; then
+	if test $PULL_DOCKERHUB -eq 1 && ${engine} pull ${DOCKERHUB_IMAGE}:latest; then
 		IMAGE_NAME=${DOCKERHUB_IMAGE}
 	else
 		echo "Failed to pull -- let's build;"
@@ -82,7 +83,7 @@ main() {
 	start_script="${engine} run -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --detach --privileged -v /:/mnt/root --workdir /mnt/root\$(pwd) --name ${CONTAINER_NAME} ${IMAGE_NAME} bash"
 	resume_script="${engine} start ${CONTAINER_NAME}"
 	__exec_script="${engine} exec -it --workdir /mnt/root\$(pwd) ${CONTAINER_NAME}"
-	exec_script="${engine} exec -it --workdir /mnt/root\$(pwd) ${CONTAINER_NAME} gofritools \\"$@\""
+	exec_script="${engine} exec -it --workdir /mnt/root\$(pwd) ${CONTAINER_NAME} gofritools \"\$@\""
 	chmod +x "${UTIL}"
 
 	(
