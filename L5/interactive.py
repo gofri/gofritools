@@ -63,7 +63,8 @@ class InteractiveMode(IOpMode):
                 try:
                     cmdline = gofriparse.read_cmdline(ui_tools.colored('>>> ', 'green'))
                     self.args = gofriparse.parse_args(parser, cmdline)
-
+                except EOFError:
+                    raise
                 except (Exception, SystemExit) as e:
                     # Remove current command and retry naturally
                     info = True
@@ -71,5 +72,9 @@ class InteractiveMode(IOpMode):
 
         except KeyboardInterrupt:
             ### handle keyboard interrupt ###
-            logging.verbose_print('Exiting due to user interrupt')
+            print('Exiting due to user interrupt (ctrl-C)')
+            return 0
+        except EOFError:
+            ### handle keyboard exit ###
+            print('Exiting due to user exit (ctrl-D)')
             return 0
