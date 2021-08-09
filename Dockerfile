@@ -10,4 +10,4 @@ RUN apk add python3 py-pip
 RUN pip3 install --user colorama argcomplete
 
 ENV PATH=$PATH:/gofritools
-RUN git clone https://github.com/gofri/gofritools.git
+RUN git clone https://github.com/gofri/gofritools.git ${BRANCH}
