@@ -61,7 +61,7 @@ class InteractiveMode(IOpMode):
                 parser = gofriparse.make_parser(interactive=True, virt=True)
 
                 try:
-                    cmdline = gofriparse.read_cmdline(ui_tools.colored('>>> ', 'green'))
+                    cmdline = gofriparse.read_cmdline(">>> ")
                     self.args = gofriparse.parse_args(parser, cmdline)
                 except EOFError:
                     raise

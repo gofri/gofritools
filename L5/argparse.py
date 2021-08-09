@@ -5,6 +5,7 @@ from L1.lower.argparse import FileLine
 from common import utils
 from L1.select import Select
 from common.argparse import general_purpose_parser
+from common.ui_tools import colored
 from L1.upper.program_factory import ProgramFactory
 import shlex
 import readline
@@ -61,10 +62,25 @@ def add_commands_parser(parser, interactive, virt, required):
     if required:
         subparsers.required = True
 
+def match_to_key(match):
+    if match.startswith('--'):
+        return 'flag'
+    elif match.startswith('-'):
+        return 'shortflag'
+    else:
+        return 'arg'
+
+def colorize_match(match):
+    key = match_to_key(match)
+    return colored(match, key=key)
+
+def match_sort_key(match):
+    return (match_to_key(match), match)
+
 g_prompt = '' # TODO replace functions here with staefull class instead of using global
 def display_completion_func(substitution, matches, longest_match_length):
     global g_prompt
-    matches = sorted([shlex.split(m)[-1] for m in matches])
+    matches = sorted([shlex.split(m)[-1] for m in matches], key=match_sort_key)
     longest = max(len(m) for m in matches)
     TAB = 4
     WIDTH = int(0.7 * os.get_terminal_size().columns)
@@ -73,14 +89,18 @@ def display_completion_func(substitution, matches, longest_match_length):
     longest += TAB # extra space between cells
 
     offset = 0
-    res = '\n'
+    res = ''
+    prev_key = ''
     try:
         for m in matches:
-            if offset + len(m) > WIDTH:
+            key = match_to_key(m)
+            if offset + len(m) > WIDTH or key != prev_key:
                 res += '\n'
                 offset = 0
-            res += m.ljust(longest)
+            res += colorize_match(m.ljust(longest))
             offset += longest
+            prev_key = key
+
         print(res + "\n" + g_prompt + readline.get_line_buffer(), end='')
         readline.redisplay()
     except Exception as e:
@@ -142,7 +162,7 @@ def parse_args(parser, cmdline=None):
 
 def read_cmdline(prompt=''):
     global g_prompt
-    g_prompt = prompt
-    res = shlex.split(input(prompt))
+    g_prompt = colored(prompt, key='prompt') 
+    res = shlex.split(input(g_prompt))
     readline.write_history_file()
     return res

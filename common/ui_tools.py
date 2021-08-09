@@ -97,6 +97,10 @@ def color_by_key(key):
         'separator': ('lightyellow_ex', ''),
         'caller': ('cyan', ''),
         'declaration': ('red', ''),
+        'arg': ('red', ''),
+        'shortflag': ('lightyellow_ex', ''),
+        'flag': ('green', ''),
+        'prompt': ('cyan', ''),
     }
 
     if key in COLORS.keys():
