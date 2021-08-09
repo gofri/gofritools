@@ -25,7 +25,7 @@ class InteractiveMode(IOpMode):
         try:
             # Welcoming gesture if entering interactive mode without command
             if not self.args.command:
-                print('Hey, welcome to gofritools interactive mode! see help above')
+                print('Hey, welcome to gofritools interactive mode!')
                 self.parser = gofriparse.make_parser(interactive=True, virt=False) # adjust parser for help
                 self.parser.print_help()
                 self.args = None
