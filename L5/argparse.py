@@ -60,6 +60,16 @@ def add_commands_parser(parser, interactive, virt, required):
     if required:
         subparsers.required = True
 
+def init_parsing_completion(interactive):
+    if interactive:
+        readline.set_completer_delims("")
+        readline.parse_and_bind("tab: complete")
+        try:
+            readline.read_history_file()
+        except FileNotFoundError:
+            pass
+
+
 def make_parser(interactive=False, virt=False):
     # Setup argument parser
     general_purpose = general_purpose_parser()
@@ -76,11 +86,8 @@ def make_parser(interactive=False, virt=False):
 
     # Autocomplete
     argcomplete.autocomplete(parser)
-    if interactive:
-        completer = argcomplete.CompletionFinder(parser)
-        readline.set_completer_delims("")
-        readline.set_completer(completer.rl_complete)
-        readline.parse_and_bind("tab: complete")
+    completer = argcomplete.CompletionFinder(parser)
+    readline.set_completer(completer.rl_complete)
 
     return parser
 
@@ -95,5 +102,6 @@ def parse_args(parser, cmdline=None):
     return args
 
 def read_cmdline(prompt=''):
-    return shlex.split(input(prompt))
-
+    res = shlex.split(input(prompt))
+    readline.write_history_file()
+    return res

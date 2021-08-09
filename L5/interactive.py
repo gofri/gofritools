@@ -22,6 +22,7 @@ class InteractiveMode(IOpMode):
         info = False
         cmd_res = None
 
+        gofriparse.init_parsing_completion(interactive=True)
         try:
             # Welcoming gesture if entering interactive mode without command
             if not self.args.command:
