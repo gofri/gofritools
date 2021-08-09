@@ -42,10 +42,11 @@ class Vim(IProgram):
             elif view_mode in ('s', 'series'):
                 pairs = FileLine.as_safe_list(pairs, sorted_=do_reverse)
                 for p in pairs:
-                    print(
-                        f'Showing {p} | Press enter to continue, s/stop to stop')
-                    if input() in ('s', 'stop'):
-                        break
+                    if len(pairs) > 1: # make default=series hidden when n_files=1
+                        print(
+                            f'Showing {p} | Press enter to continue, s/stop to stop')
+                        if input() in ('s', 'stop'):
+                            break
                     args = [p.file, f'+{self.__fix_default_line(p.line)}']
                     self.ishell.interactive_cmd(vim_cmd + args)
 
