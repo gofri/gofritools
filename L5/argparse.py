@@ -28,7 +28,7 @@ def mode_parser(parser):
     def add_mode_parser(p, name, /, *args, aliases, **kwargs):
         return add_sub_parser(p, {'mode':name}, *args, aliases=aliases, **kwargs)
 
-    subparsers = parser.add_subparsers(dest='mode')
+    subparsers = parser.add_subparsers(dest='mode', required=True)
     parsers = {}
 
     for p in ('interactive', 'batch'):
@@ -38,7 +38,7 @@ def mode_parser(parser):
 
 def add_commands_parser(parser, interactive, virt, required):
     # TODO interactive/virt ==> will move naturally when each layer exports its argparse
-    subparsers = parser.add_subparsers(dest='command')
+    subparsers = parser.add_subparsers(dest='command', required=True)
 
     ProgramFactory.arg_parser(subparsers)
 
