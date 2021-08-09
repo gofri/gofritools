@@ -6,6 +6,9 @@ from common import utils
 from L1.select import Select
 from common.argparse import general_purpose_parser
 from L1.upper.program_factory import ProgramFactory
+import shlex
+import readline
+import argcomplete
 
 ''' DEPRECATED: started moving to each prog '''
 def add_sub_parser(p, kv_dict, /, *args, aliases, **kwargs):
@@ -73,6 +76,12 @@ def make_parser(interactive=False, virt=False):
 
     # Autocomplete
     argcomplete.autocomplete(parser)
+    if interactive:
+        completer = argcomplete.CompletionFinder(parser)
+        readline.set_completer_delims("")
+        readline.set_completer(completer.rl_complete)
+        readline.parse_and_bind("tab: complete")
+
     return parser
 
 def parse_args(parser, cmdline=None):
@@ -84,3 +93,7 @@ def parse_args(parser, cmdline=None):
     del args.no_verbosity
 
     return args
+
+def read_cmdline():
+    return shlex.split(input())
+

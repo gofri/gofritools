@@ -1,10 +1,7 @@
-import shlex
-import argparse as pyargparse
-
 from common import logging, ui_tools, utils
 from L4.stack import Stack
 from L5.lower.iopmode import IOpMode
-from L5 import argparse
+from L5 import argparse as gofriparse
 
 class InteractiveMode(IOpMode):
     def __init__(self, stack, parser, args):
@@ -29,7 +26,7 @@ class InteractiveMode(IOpMode):
             # Welcoming gesture if entering interactive mode without command
             if not self.args.command:
                 print('Hey, welcome to gofritools interactive mode! see help above')
-                self.parser = argparse.make_parser(interactive=True, virt=False) # adjust parser for help
+                self.parser = gofriparse.make_parser(interactive=True, virt=False) # adjust parser for help
                 self.parser.print_help()
                 self.args = None
 
@@ -61,12 +58,13 @@ class InteractiveMode(IOpMode):
 
                 # Read next cmd
                 print(ui_tools.colored('>>> ', 'green'), end='')
-                parser = argparse.make_parser(interactive=True, virt=True)
+                parser = gofriparse.make_parser(interactive=True, virt=True)
 
                 try:
-                    cmdline = shlex.split(input())
-                    self.args = argparse.parse_args(parser, cmdline)
-                except (Exception, SystemExit):
+                    cmdline = gofriparse.read_cmdline()
+                    self.args = gofriparse.parse_args(parser, cmdline)
+
+                except (Exception, SystemExit) as e:
                     # Remove current command and retry naturally
                     info = True
                     self.args = None
