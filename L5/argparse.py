@@ -9,6 +9,7 @@ from L1.upper.program_factory import ProgramFactory
 import shlex
 import readline
 import argcomplete
+import os
 
 ''' DEPRECATED: started moving to each prog '''
 def add_sub_parser(p, kv_dict, /, *args, aliases, **kwargs):
@@ -60,10 +61,38 @@ def add_commands_parser(parser, interactive, virt, required):
     if required:
         subparsers.required = True
 
+g_prompt = '' # TODO replace functions here with staefull class instead of using global
+def display_completion_func(substitution, matches, longest_match_length):
+    global g_prompt
+    matches = sorted([shlex.split(m)[-1] for m in matches])
+    longest = max(len(m) for m in matches)
+    TAB = 4
+    WIDTH = int(0.7 * os.get_terminal_size().columns)
+    if longest % TAB != 0: # round up
+        longest = longest + (TAB - longest%TAB) 
+    longest += TAB # extra space between cells
+
+    offset = 0
+    res = '\n'
+    try:
+        for m in matches:
+            if offset + len(m) > WIDTH:
+                res += '\n'
+                offset = 0
+            res += m.ljust(longest)
+            offset += longest
+        print(res + "\n" + g_prompt + readline.get_line_buffer(), end='')
+        readline.redisplay()
+    except Exception as e:
+        print(e)
+
+    return res
+        
 def init_parsing_completion(interactive):
     if interactive:
         readline.set_completer_delims("")
         readline.parse_and_bind("tab: complete")
+        readline.set_completion_display_matches_hook(display_completion_func)
         try:
             readline.read_history_file()
         except FileNotFoundError:
@@ -96,7 +125,7 @@ def make_parser(interactive=False, virt=False):
 
     # Autocomplete
     argcomplete.autocomplete(parser)
-    completer = FilteredFinder(parser) # argcomplete.CompletionFinder(parser)
+    completer = FilteredFinder(parser, default_completer=None) # argcomplete.CompletionFinder(parser)
     readline.set_completer(completer.rl_complete)
 
     return parser
@@ -112,6 +141,8 @@ def parse_args(parser, cmdline=None):
     return args
 
 def read_cmdline(prompt=''):
+    global g_prompt
+    g_prompt = prompt
     res = shlex.split(input(prompt))
     readline.write_history_file()
     return res
