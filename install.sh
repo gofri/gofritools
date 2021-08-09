@@ -95,7 +95,7 @@ main() {
 		echo "${UTIL_NAME} i \"\$@\"" > gofi
 		echo "${UTIL_NAME} i g \"\$@\"" > gg
 		echo "${UTIL_NAME} i f \"\$@\"" > ff
-		echo "$start_script || $resume_script" > gof-start
+		echo "$start_script 2>/dev/null || $resume_script" > gof-start
 		echo "$__exec_script bash -c '(cd /gofritools && git pull)'" > gof-update
 		echo "$__exec_script bash -c '(cd /gofritools && git fetch && git reset --hard origin/master)'" > gof-force-update
 		echo "$__exec_script bash" > gof-enter
