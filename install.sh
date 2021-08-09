@@ -94,7 +94,7 @@ main() {
         cd $INSTALL_DIR
         echo "$exec_script" > "${UTIL_NAME}"
         echo "${UTIL_NAME} b \"\$@\"" > gof
-        echo "${UTIL_NAME} i \"\$@\"" > gofi
+        echo "${UTIL_NAME} i \"\$@\"" > gi
         echo "${UTIL_NAME} i g \"\$@\"" > gg
         echo "${UTIL_NAME} i f \"\$@\"" > ff
         echo "$start_script 2>/dev/null || $resume_script" > gof-start
