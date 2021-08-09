@@ -38,7 +38,7 @@ def mode_parser(parser):
 
 def add_commands_parser(parser, interactive, virt, required):
     # TODO interactive/virt ==> will move naturally when each layer exports its argparse
-    subparsers = parser.add_subparsers(dest='command', required=True)
+    subparsers = parser.add_subparsers(dest='command', required=virt)
 
     ProgramFactory.arg_parser(subparsers)
 
@@ -94,6 +94,6 @@ def parse_args(parser, cmdline=None):
 
     return args
 
-def read_cmdline():
-    return shlex.split(input())
+def read_cmdline(prompt=''):
+    return shlex.split(input(prompt))
 

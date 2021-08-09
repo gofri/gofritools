@@ -57,11 +57,10 @@ class InteractiveMode(IOpMode):
                     print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
 
                 # Read next cmd
-                print(ui_tools.colored('>>> ', 'green'), end='')
                 parser = gofriparse.make_parser(interactive=True, virt=True)
 
                 try:
-                    cmdline = gofriparse.read_cmdline()
+                    cmdline = gofriparse.read_cmdline(ui_tools.colored('>>> ', 'green'))
                     self.args = gofriparse.parse_args(parser, cmdline)
 
                 except (Exception, SystemExit) as e:
