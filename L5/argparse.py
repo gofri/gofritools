@@ -70,6 +70,16 @@ def init_parsing_completion(interactive):
             pass
 
 
+class FilteredFinder(argcomplete.CompletionFinder):
+    def __init__(self, *args, **kwargs):
+        argcomplete.CompletionFinder.__init__(self, *args, **kwargs)
+
+    def quote_completions(self, completions, cword_prequote, last_wordbreak_pos):
+        res = argcomplete.CompletionFinder.quote_completions(self, completions, cword_prequote, last_wordbreak_pos)
+        # print(res) # no filtering at this time
+        return res
+
+
 def make_parser(interactive=False, virt=False):
     # Setup argument parser
     general_purpose = general_purpose_parser()
@@ -86,7 +96,7 @@ def make_parser(interactive=False, virt=False):
 
     # Autocomplete
     argcomplete.autocomplete(parser)
-    completer = argcomplete.CompletionFinder(parser)
+    completer = FilteredFinder(parser) # argcomplete.CompletionFinder(parser)
     readline.set_completer(completer.rl_complete)
 
     return parser
