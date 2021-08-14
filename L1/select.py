@@ -109,5 +109,3 @@ class Select(IProgram):
         ], help='Select multiple ranges of a list by indices')
         select_parser.add_argument(
             'ranges', help='list of space separated row indices (N) or index ranges (N1-N2)', type=Select.RangeType, nargs='+')
-        select_parser.add_argument(
-            '--data-list', help='The list to operate on', nargs="+", default=[])
