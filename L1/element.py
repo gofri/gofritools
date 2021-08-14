@@ -15,7 +15,7 @@ class Element(IProgram):
         ], help='Select one or more element from previous output (path/line/text/text_colored)')
         element_parser.add_argument('elements', help='element', nargs='*')
         element_parser.add_argument(
-            '-s', '--sort', help='Sort (instead of choose) the element.', action='store_true')
+            '-s', '--sort', help='Sort by (instead of choose) the element.', action='store_true')
         element_parser.add_argument(
             '-u', '--unify', help='Unify the results based on a single element', action='store_true')
         element_parser.add_argument('-n', '--no-choice', dest='do_choice', default=True,
