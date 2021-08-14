@@ -42,6 +42,7 @@ class InteractiveMode(IOpMode):
                                 print('Goodbye!')
                                 break
                             cmd_res = self.stack.put(self.args)
+                            info = False
                 except Stack.OpMessage as e:
                     logging.print_warning(e)
                     info = True
@@ -55,7 +56,7 @@ class InteractiveMode(IOpMode):
                 if cmd_res:
                     if not (self.__verbosity or info):
                         ui_tools.clear_screen()
-                    print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
+                        print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
 
                 # Read next cmd
                 parser = gofriparse.make_parser(interactive=True, virt=True)
