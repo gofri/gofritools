@@ -1,13 +1,12 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-import math
 import colorama
+import math
 import re
-from L0.bash import Bash
-
 
 def uncolor(text):
+    from L0.bash import Bash
     return Bash().run_cmd(['ansi2txt'], stdin=text)['stdout']
 
 
@@ -36,6 +35,8 @@ def colored(text, color='', bg='', key=None, end=True):
 
     return colored
 
+def highlight(*args, **kwargs):
+    return colored(*args, **kwargs, key='highlight')
 
 def end_of_color(text):
     return text + colorama.Style.RESET_ALL
@@ -101,6 +102,7 @@ def color_by_key(key):
         'shortflag': ('lightyellow_ex', ''),
         'flag': ('green', ''),
         'prompt': ('cyan', ''),
+        'highlight': ('red', 'white')
     }
 
     if key in COLORS.keys():

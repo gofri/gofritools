@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
-from common import utils, logging
+from common import ui_tools, utils, logging
 from L1.lower.iprogram import IProgram
 import argparse
 from L1.lower.argparse import common_file_line_parser, FileLine
@@ -44,7 +44,7 @@ class Vim(IProgram):
                 for p in pairs:
                     if len(pairs) > 1: # make default=series hidden when n_files=1
                         print(
-                            f'Showing {p} | Press enter to continue, s/stop to stop')
+                            f'Showing {ui_tools.highlight(p)} | Press enter to continue, s/stop to stop')
                         if input() in ('s', 'stop'):
                             break
                     args = [p.file, f'+{self.__fix_default_line(p.line)}']

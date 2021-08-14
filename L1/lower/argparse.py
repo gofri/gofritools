@@ -1,4 +1,5 @@
 import argparse
+from common import ui_tools
 
 class FileLine(object):
     SEPARATOR = ':'
@@ -53,8 +54,19 @@ class FileLine(object):
         kwargs[KEY] = pairs
         return kwargs
 
+    def colored(self):
+        file = ui_tools.colored(self.file, key='path')
+        if self.line is None:
+            return f'{self.file}'
+        sep = ui_tools.colored(':', key='separator')
+        line = ui_tools.colored(self.line, key='line')
+        return f'{file}{sep}{line}'
+
     def __str__(self):
-        return f'{self.file}:{self.line}'
+        if self.line is None:
+            return f'{self.file}'
+        else:            
+            return f'{self.file}:{self.line}'
     
     def __repr__(self):
         return str(self)
