@@ -56,6 +56,7 @@ class InteractiveMode(IOpMode):
                 if cmd_res:
                     if not (self.__verbosity or info):
                         ui_tools.clear_screen()
+                    if not info:
                         print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
 
                 # Read next cmd
