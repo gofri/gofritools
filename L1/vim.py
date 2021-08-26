@@ -10,16 +10,20 @@ class Vim(IProgram):
         assert len(pairs) > 0, "empty file selection for vim"
         self.__open_multiple_files(pairs, view_mode, readonly, reverse)
 
-    def is_reverse(self, reverse, readonly):
+    def is_reverse(self, reverse, readonly, view_mode):
         if reverse in (True, False):
             return reverse
-        else: # if not explicitly set, let readonly dictate it: prefer reversed order if the files are modifiable
+        elif view_mode == "series":
+            # if not explicitly set, let readonly dictate it:
+            # prefer reversed order if the files are modifiable one after another.
             return not readonly
+        else:
+            return False # no reason to reverse by default
 
     def __open_multiple_files(self, pairs, view_mode, readonly, reverse):
-        logging.verbose_print(f'read/reverse: {readonly}, {reverse}, {self.is_reverse(reverse, readonly)}')
+        logging.verbose_print(f'read/reverse: {readonly}, {reverse}, {self.is_reverse(reverse, readonly, view_mode)}')
         files = [p.file for p in pairs]
-        do_reverse = self.is_reverse(reverse, readonly)
+        do_reverse = self.is_reverse(reverse, readonly, view_mode)
         if readonly:
             vim_cmd = ['vim', '-R']
         else:
@@ -28,15 +32,14 @@ class Vim(IProgram):
             if view_mode in ('c', 'combo'):
                 if do_reverse:
                     pairs = list(reversed(pairs))
-                # XXX: The first arg file is passed differently (w/o vsp & as distinct args for file nad line).
-                last = pairs[-1]
-                last_line = self.__fix_default_line(last.line)
-                last_file_args = [f'+{last_line}', last.file]
+                # XXX: The first arg file is passed differently (w/o vsp & as distinct args for file and line).
+                first = pairs[0]
+                first_line = self.__fix_default_line(first.line)
+                first_file_args = [f'+{first_line}', first.file]
 
-                # XXX: In this split mode, vim expects the file in a reversed oreder
-                rest_files_args = [f'+vsp +{self.__fix_default_line(p.line)} {p.file}' for p in reversed(pairs[:-1])]
+                rest_files_args = [f'+vsp +{self.__fix_default_line(p.line)} {p.file}' for p in pairs[1:]]
 
-                args = last_file_args + rest_files_args
+                args = first_file_args + rest_files_args
                 self.ishell.interactive_cmd(vim_cmd + args)
 
             elif view_mode in ('s', 'series'):
