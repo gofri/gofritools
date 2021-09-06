@@ -9,7 +9,7 @@ from L1.lower.argparse import common_pattern_parser
 
 class Find(IProgram):
     def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
-        # TODO native invert & whole_word
+        # TODO whole_word
         # TODO more generally, find should behave like grep, by means that:
         #   * search, rather than match (see note below).
         #   * search is done on the basename, excluding the suffix.
@@ -23,9 +23,9 @@ class Find(IProgram):
         pattern = [self.__with_regex_prefix(p) for p in pattern]
         SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
         if suffix:
-            suffix = '\(\.\(' + '\|'.join(suffix) + '\)\)$'
+            suffix = '(\.(' + '|'.join(suffix) + '))$'
             pattern = [p + suffix for p in pattern]
-        regextype = ['-regextype', 'grep']
+        regextype = ['-regextype', 'egrep']
         files_to_search = self.__get_files_to_search(files)
         # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find/25234419#comment48051875_25234419
         print_action = ['-print']
@@ -35,7 +35,7 @@ class Find(IProgram):
         invert = '!' if invert else ''
 
         # find's -or options take only the first option -- build it with regex instead.
-        pattern = [invert, regex, '\|'.join(f'\({p}\)' for p in pattern)]
+        pattern = [invert, regex, '|'.join(f'({p})' for p in pattern)]
 
         # make sure to filter out by suffix even on invertion
         if invert:
@@ -64,7 +64,7 @@ class Find(IProgram):
         return files if files else ['.']
 
     def __with_regex_prefix(self, pattern):
-        return r'\(.*/\|^\)' + pattern  # Regex is fullpath based
+        return r'(.*/|^)' + pattern  # Regex is fullpath based
 
     def __remove_leading_cur_dir(self, paths):
         return [path[2:] if path.startswith('./') else path for path in paths]
