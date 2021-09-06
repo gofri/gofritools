@@ -9,4 +9,7 @@ class VirtFind(IVirt):
         IVirt.__init__(self, *args, **kwargs, _underlying_prog_t=Find, stackable=True, dirtying=False)
 
     def _run_virt(self, **kwargs):
-        return self._virt_paths(kwargs, text_match=False)
+        if self.prev_output.paths:
+            return self._native_find(**kwargs)
+        else:
+            return self._virt_paths(kwargs, text_match=False)

@@ -6,6 +6,8 @@ from abc import abstractmethod
 from common import utils
 from common.utils import SimpleCache
 import copy
+from common.res import SearchRes
+from common import ui_tools
 
 class IVirt(IProgram):
     def __init__(self, ishell, prev_output, _underlying_prog_t, stackable=True, dirtying=True):
@@ -51,6 +53,13 @@ class IVirt(IProgram):
         '''
         if self.prev_output.is_empty(): # #1
             return self._underlying_prog.run(**kwargs)
+        else:
+            kwargs['text'] = self.prev_output.texts
+            kwargs['lines'] = self.prev_output.lines
+            kwargs['files'] = self.prev_output.paths
+            kwargs['text_colored'] = self.prev_output.texts_colored
+            self._underlying_prog.run(**kwargs)
+            return self._underlying_prog.output 
 
         prev_files = self.prev_output.paths
 
@@ -60,8 +69,10 @@ class IVirt(IProgram):
         else:
             kwargs['files'] = prev_files
 
+        lines = self.prev_output.lines
+
         # Run new prog
-        self._underlying_prog.run(**kwargs)
+        self._underlying_prog.run(lines=lines, **kwargs)
         new_output = self._underlying_prog.output
 
         # Now we need a different solution for #1 vs #2:
@@ -77,3 +88,42 @@ class IVirt(IProgram):
             output = new_output
 
         return output
+
+    def _native_grep(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
+        res = SearchRes()
+        text = self.prev_output.texts
+        text_colored = list(self.prev_output.texts_colored) # clone for local modification 
+        files = self.prev_output.paths
+        lines = self.prev_output.lines
+
+        for i, t in enumerate(text):
+            any_pattern = False
+            for p in pattern:
+                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
+                if bool(compiled.search(t)) != invert:
+                    any_pattern = True
+                    pattern_colored = ui_tools.colored(p, key='text')
+                    text_colored[i] = compiled.sub(pattern_colored, text_colored[i])
+            if any_pattern:
+                res.add_record(path=files[i], line=lines[i], text=text[i], text_colored=text_colored[i])
+
+        return res 
+
+    def _native_find(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
+        res = SearchRes()
+        text = self.prev_output.texts
+        text_colored = list(self.prev_output.texts_colored) # clone for local modification 
+        files = self.prev_output.paths
+        lines = self.prev_output.lines
+
+        for i, f in enumerate(files):
+            any_pattern = False
+            for p in pattern:
+                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
+                if bool(compiled.search(f)) != invert:
+                    any_pattern = True
+                    break
+            if any_pattern:
+                res.add_record(path=files[i], line=lines[i], text=text[i], text_colored=text_colored[i])
+
+        return res 

@@ -82,6 +82,10 @@ def common_pattern_parser():
                                 action='count', default=0)
     common_pattern.add_argument(
         '-f', '--files', help='Limit the operation to specific files / directories', type=str, nargs='+', default=[])
+    common_pattern.add_argument(
+        '-v', '--invert', action='store_true', help='invert match (like grep -v)')
+    common_pattern.add_argument(
+        '-w', '--whole-word', help='grep for whole word', action='store_true', default=False)
 
     return common_pattern
 

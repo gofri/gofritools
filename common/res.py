@@ -97,6 +97,10 @@ class SearchRes(IRes):
         return [r.text for r in self._records]
 
     @property
+    def lines(self):
+        return [r.line for r in self._records]
+
+    @property
     def texts_colored(self):
         return [r.text_colored for r in self._records]
 

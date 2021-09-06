@@ -88,14 +88,6 @@ def get_as_incrementing_list(lst, formatter=None, is_colored=False, **kwargs):
 
     return '\n'.join(res)
 
-
-def colorize_matches(text, *matches, **kwargs):
-    colorized = []
-    for m in matches:
-        colored = colored(m, **kwargs)
-        colorized.append(re.sub(m, colored, text))
-    return colorized
-
 def color_by_key(key):
     COLORS = {
         'path': ('lightmagenta_ex', ''),

@@ -8,7 +8,17 @@ from L1.lower.argparse import common_pattern_parser
 
 
 class Find(IProgram):
-    def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None):
+    def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
+        # TODO native invert & whole_word
+        # TODO more generally, find should behave like grep, by means that:
+        #   * search, rather than match (see note below).
+        #   * search is done on the basename, excluding the suffix.
+        #   * a first level of wild-ening is searching for any directive of the path
+        #     TIP: find -regex (acts on whole path) with '/pattern' should work for searching any-directive of the path
+        #   * a whole-word is, by nature, the entire base name.
+        #     "by nature", rather than by definition: if the directive is e.g. wierd-file+name.txt,
+        #     then whole word will not work properly here, since e.g. 'wierd' is a valid whole-word here.
+        #   * THE REAL FIND (this function) should be heavily adjusted accordingly. 
         pattern = [utils.get_wild_version(p, wildness) for p in pattern]
         pattern = [self.__with_regex_prefix(p) for p in pattern]
         SUPRESS_PERM_ERRORS = ['!', '-readable', '-prune', '-o']

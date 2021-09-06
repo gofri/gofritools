@@ -7,6 +7,7 @@ import os
 import importlib
 import inspect
 import pickle
+import re
 from enum import Enum, auto
 from common import logging
 
@@ -225,3 +226,8 @@ def collect_bin_stdin():
 
     return utils.depicklize_file(sys.stdin.buffer)
 
+def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
+    pattern = rf'\b{pattern}\b' if whole_word else pattern
+    pattern = get_wild_version(pattern, wildness)
+    flags = 0 if case_sensitive else re.IGNORECASE
+    return re.compile(pattern, flags)
