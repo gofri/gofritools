@@ -6,8 +6,6 @@ from abc import abstractmethod
 from common import utils
 from common.utils import SimpleCache
 import copy
-from common.res import SearchRes
-from common import ui_tools
 
 class IVirt(IProgram):
     def __init__(self, ishell, prev_output, _underlying_prog_t, stackable=True, dirtying=True):
@@ -88,42 +86,3 @@ class IVirt(IProgram):
             output = new_output
 
         return output
-
-    def _native_grep(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
-        res = SearchRes()
-        text = self.prev_output.texts
-        text_colored = list(self.prev_output.texts_colored) # clone for local modification 
-        files = self.prev_output.paths
-        lines = self.prev_output.lines
-
-        for i, t in enumerate(text):
-            any_pattern = False
-            for p in pattern:
-                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
-                if bool(compiled.search(t)) != invert:
-                    any_pattern = True
-                    pattern_colored = ui_tools.colored(p, key='text')
-                    text_colored[i] = compiled.sub(pattern_colored, text_colored[i])
-            if any_pattern:
-                res.add_record(path=files[i], line=lines[i], text=text[i], text_colored=text_colored[i])
-
-        return res 
-
-    def _native_find(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
-        res = SearchRes()
-        text = self.prev_output.texts
-        text_colored = list(self.prev_output.texts_colored) # clone for local modification 
-        files = self.prev_output.paths
-        lines = self.prev_output.lines
-
-        for i, f in enumerate(files):
-            any_pattern = False
-            for p in pattern:
-                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
-                if bool(compiled.search(f)) != invert:
-                    any_pattern = True
-                    break
-            if any_pattern:
-                res.add_record(path=files[i], line=lines[i], text=text[i], text_colored=text_colored[i])
-
-        return res 
