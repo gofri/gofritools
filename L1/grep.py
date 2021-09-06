@@ -119,6 +119,7 @@ class Grep(IProgram):
         grep_parser = cls._add_command_parser(parent, 'grep', aliases='g', parents=[
                                             common_pattern_parser()], help='grep operations (note: searches git repo by default)')
         inputs = grep_parser.add_mutually_exclusive_group()
+        # TODO git/untracked should be supported by find too
         inputs.add_argument('-g', '--git', help='Search files within the git repo',
                             action='store_true', dest='git', default=True)
         inputs.add_argument(

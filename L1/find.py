@@ -8,6 +8,7 @@ from L1.lower.argparse import common_pattern_parser
 
 
 class Find(IProgram):
+    SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
     def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
         # TODO whole_word
         # TODO more generally, find should behave like grep, by means that:
@@ -15,16 +16,29 @@ class Find(IProgram):
         #   * search is done on the basename, excluding the suffix.
         #   * a first level of wild-ening is searching for any directive of the path
         #     TIP: find -regex (acts on whole path) with '/pattern' should work for searching any-directive of the path
+        #     given that pattern is alrady adjusted to act as search rather match
         #   * a whole-word is, by nature, the entire base name.
         #     "by nature", rather than by definition: if the directive is e.g. wierd-file+name.txt,
         #     then whole word will not work properly here, since e.g. 'wierd' is a valid whole-word here.
+        #     
         #   * THE REAL FIND (this function) should be heavily adjusted accordingly. 
-        pattern = [utils.get_wild_version(p, wildness) for p in pattern]
+        if whole_word:
+            pattern = [fr'\b{p}\b' for p in pattern]
+
+        # special treat wildness to handle paths
+        pre_crosser = '.*' if wildness>=1 else '[^/]*' # allow for cross-dir search
+        post_crosser = '[^\./]*' # XXX: for ease of impl, "bug": act as if non-basename should not have suffix either
+        fake_wildness = max(1, wildness) # set wildness to >= 1 to force wrapping with pre/post (search rather than match)
+        pattern = [utils.get_wild_version(p, fake_wildness, pre_any=pre_crosser, post_any=post_crosser) for p in pattern]
         pattern = [self.__with_regex_prefix(p) for p in pattern]
-        SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
+
+        # add suffix
         if suffix:
             suffix = '(\.(' + '|'.join(suffix) + '))$'
-            pattern = [p + suffix for p in pattern]
+        else:
+            suffix = '$'
+        pattern = [p + suffix for p in pattern]
+
         regextype = ['-regextype', 'egrep']
         files_to_search = self.__get_files_to_search(files)
         # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find/25234419#comment48051875_25234419
@@ -43,7 +57,7 @@ class Find(IProgram):
 
         cmd = ['find'] + \
             files_to_search + \
-            SUPRESS_PERM_ERRORS + \
+            self.SUPRESS_PERM_ERRORS + \
             regextype + \
             (extra_flags or []) + \
             pattern + \
