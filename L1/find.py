@@ -21,7 +21,7 @@ class Find(IProgram):
         #   * THE REAL FIND (this function) should be heavily adjusted accordingly. 
         pattern = [utils.get_wild_version(p, wildness) for p in pattern]
         pattern = [self.__with_regex_prefix(p) for p in pattern]
-        SUPRESS_PERM_ERRORS = ['!', '-readable', '-prune', '-o']
+        SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
         if suffix:
             suffix = '\(\.\(' + '\|'.join(suffix) + '\)\)$'
             pattern = [p + suffix for p in pattern]
@@ -32,9 +32,14 @@ class Find(IProgram):
 
         case_fix = '' if case_sensitive else 'i'
         regex = f'-{case_fix}regex'
+        invert = '!' if invert else ''
 
         # find's -or options take only the first option -- build it with regex instead.
-        pattern = [regex, '\|'.join(f'\({p}\)' for p in pattern)]
+        pattern = [invert, regex, '\|'.join(f'\({p}\)' for p in pattern)]
+
+        # make sure to filter out by suffix even on invertion
+        if invert:
+            pattern += ['-and', regex, '.*'+suffix]
 
         cmd = ['find'] + \
             files_to_search + \
@@ -47,6 +52,7 @@ class Find(IProgram):
         res = self.ishell.run_cmd(cmd, must_work=True)
         matches = res['stdout'].splitlines()
         ''' TODO integrate into search res record creation '''
+
         matches = self.__remove_leading_cur_dir(matches)
         matches = utils.unify_paths(matches)
 
@@ -71,5 +77,16 @@ class Find(IProgram):
         suffix_options = find_parser.add_mutually_exclusive_group()
         suffix_options.add_argument('-s', '--suffix', nargs='*', type=str, help='File extension (e.g. cpp, py)', default=[
                                     'py', 'c', 'cpp', 'cc', 'h', 'hpp', 'java', 'md', 'jinja', 'jinja2', 'json', 'rpm', 'sh', 'text', 'txt', 'go', 'js'])
+        # TODO add invert-search for file extension (exclusive group with suffix):
+        #   * combinations: (of --invert, --suffix, --invert-suffix)
+        #   1. pattern without --invert [regular search]
+        #       a. empty --suffix: pattern without suffix
+        #       b. non-empty --suffix: pattern with suffix
+        #       c. non-empty --invert-suffix: pattern with any suffix, filter-out by suffix
+        #   2. pattern with --invert: [invert search]
+        #       a. empty --suffix: -not pattern without suffix (no need to re-filter-in suffix)
+        #       b. non-empty --suffix: -not pattern with suffix (re-filter-in suffix)
+        #       c. non-empty --invert-suffix: -not pattern with any suffix, filter-out by suffix
+        # TODO also need to add the suffix support to the new py-native virt version
         suffix_options.add_argument(
             '-S', '--no-suffix', action='store_false', dest='suffix', help='No file extension')
