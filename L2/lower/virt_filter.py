@@ -5,8 +5,10 @@ from common.res import SearchRes
 from common import ui_tools
 from enum import Enum, auto
 
+import os
+
 class BasicFilter(object):
-    def __init__(self, pattern, wildness, case_sensitive, whole_word, invert):
+    def __init__(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
         self.pattern = pattern
         self.wildness = wildness
         self.case_sensitive = case_sensitive
@@ -21,8 +23,17 @@ class BasicFilter(object):
         pass
 
 class PathFilter(BasicFilter):
+    def __init__(self, /, *args, suffix, **kwargs):
+        BasicFilter.__init__(self, *args, **kwargs)
+        self.suffix = suffix
+    
     def match(self, data):
-        # TODO fix for proper handling of paths
+        parts = data.split('/') # XXX: broken for slash in file name 
+        path, basename = parts[:-1], parts[-1]
+        filename, fileext = os.path.splitext(basename)
+
+        # TODO implement find.py rules 
+        
         return bool(self.compiled.search(data)) != self.invert
 
 class TextFilter(BasicFilter):
@@ -30,6 +41,14 @@ class TextFilter(BasicFilter):
         return bool(self.compiled.search(data)) != self.invert
 
     def post_did_match(self, index, data, virt_filter):
+        # TODO bug: might turn letter from capital to non or vice versa when used with -i
+        #           harder than one would think... need to:
+        #           1. clone the org text_colored
+        #           2. finditer(data)
+        #           3. for each iter:
+        #               colored = sub(clone[till_this_part:])
+        #               clone = clone[:till this part] + colored
+        #           4. text_colored[i] = clone
         pattern_colored = ui_tools.colored(self.pattern, key='text')
         virt_filter.text_colored[index] = self.compiled.sub(pattern_colored, virt_filter.text_colored[index])
 
@@ -64,7 +83,7 @@ class VirtualFilter(object):
         for i, t in enumerate(filteree):
             any_pattern = False
             for p in pattern:
-                _filter = self.filteree.get_filter(p, wildness, case_sensitive, whole_word, invert)
+                _filter = self.filteree.get_filter(p, wildness, case_sensitive, whole_word, invert, **ignorable)
                 if _filter.match(t):
                     any_pattern = True
                     _filter.post_did_match(i, t, self)
