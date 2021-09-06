@@ -8,6 +8,8 @@ class BatchMode(IOpMode):
         self.args = args
 
     def run(self):
+        logging.set_verbosity(self.args.verbosity)
+        logging.verbose_print(self.args, min_verbosity=logging.VERBOSE_3)
         cmd_res = self.stack.put(self.args)
         if utils.is_pipe(sys.stdout):
             # XXX: need to write this way because is binary data

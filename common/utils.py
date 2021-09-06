@@ -7,6 +7,7 @@ import os
 import importlib
 import inspect
 import pickle
+import re
 from enum import Enum, auto
 from common import logging
 
@@ -28,19 +29,19 @@ class SimpleCache(object):
             self.data = self.action(*self.args, **self.kwargs)
         return self.data
 
-def get_wild_version(pattern, wildness):
-    pattern_of_any = '.*'
-    def surround_any(x): return pattern_of_any + x + pattern_of_any
+def get_wild_version(pattern, wildness, pre_any='.*', post_any='.*'):
+    def surround_any(x): return pre_any + x + post_any
     def replace_separators(x): return x.replace(
-        '-', '_').replace(' ', '_').replace('_', '[ _-]*')
+        '-', '_').replace(' ', '_').replace('_', '[ _-]+')
 
+    # XXX: do not make wildness=0 add surround_any:
+    #      although same result, text coloring would be different
     if wildness == 0:
         return pattern
     elif wildness == 1:
         return surround_any(pattern)
-    else:  # wildness >= 2:
+    elif wildness >= 2:
         return surround_any(replace_separators(pattern))
-
 
 class MultipleFiles(object):
     @staticmethod
@@ -223,5 +224,10 @@ def collect_bin_stdin():
     if not is_pipe(sys.stdin):
         raise NoPipe()
 
-    return utils.depicklize_file(sys.stdin.buffer)
+    return depicklize_file(sys.stdin.buffer)
 
+def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
+    pattern = rf'\b{pattern}\b' if whole_word else pattern
+    pattern = get_wild_version(pattern, wildness)
+    flags = 0 if case_sensitive else re.IGNORECASE
+    return re.compile(pattern, flags)

@@ -9,6 +9,7 @@ class InteractiveMode(IOpMode):
         self.args = args
         self.parser = parser
         self.verbosity = args.verbosity # base verbosity for all cmds
+        self.args.verbosity = 0 # Avoid double-counting of verbosity of first cmd
 
     @property
     def __verbosity(self):
@@ -36,6 +37,7 @@ class InteractiveMode(IOpMode):
                 try:
                     if self.args:
                         logging.set_verbosity(self.__verbosity)
+                        logging.verbose_print(self.args, min_verbosity=logging.VERBOSE_3)
                         if self.args.command:
                             logging.verbose_print(f'Handling next command: {self.args.command}')
                             if self.args.command == 'quit':
@@ -51,7 +53,7 @@ class InteractiveMode(IOpMode):
                     info = True
                     logging.print_warning(e)
                     if logging.global_verbosity > 1:
-                        logging.log_ex()  # TODO this is ugly
+                        logging.log_ex()
 
                 if cmd_res:
                     if not (self.__verbosity or info):

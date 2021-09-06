@@ -18,16 +18,17 @@ def clear_screen():
     print(get_clear_screen_str())
 
 
-def colored(text, color='', bg='', key=None, end=True):
+def colored(text, color='', bg='', style='', key=None, end=True):
     def get_color(c, bundle):
         return bundle.__dict__[c.upper()] if c else ''
 
     if key is not None:
-        newcolor, newbg = color_by_key(key)
+        newcolor, newbg, style = color_by_key(key)
         color = color or newcolor or 'white'
         bg = bg or newbg
 
     colored = get_color(color, colorama.Fore) + \
+        style + \
         get_color(bg, colorama.Back) + \
         str(text)
     if end:
@@ -88,21 +89,20 @@ def get_as_incrementing_list(lst, formatter=None, is_colored=False, **kwargs):
 
     return '\n'.join(res)
 
-
 def color_by_key(key):
     COLORS = {
-        'path': ('lightmagenta_ex', ''),
-        'line': ('green', ''),
-        'text': ('red', ''),
-        'index': ('', 'black'),
-        'separator': ('lightyellow_ex', ''),
-        'caller': ('cyan', ''),
-        'declaration': ('red', ''),
-        'arg': ('red', ''),
-        'shortflag': ('lightyellow_ex', ''),
-        'flag': ('green', ''),
-        'prompt': ('cyan', ''),
-        'highlight': ('red', 'white')
+        'path': ('lightmagenta_ex', '', ''),
+        'line': ('green', '', ''),
+        'text': ('red', '', colorama.Style.BRIGHT),
+        'index': ('', 'black', ''),
+        'separator': ('lightyellow_ex', '', ''),
+        'caller': ('cyan', '', ''),
+        'declaration': ('red', '', ''),
+        'arg': ('red', '', ''),
+        'shortflag': ('lightyellow_ex', '', ''),
+        'flag': ('green', '', ''),
+        'prompt': ('cyan', '', ''),
+        'highlight': ('red', 'white', '')
     }
 
     if key in COLORS.keys():

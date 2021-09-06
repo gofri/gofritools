@@ -9,6 +9,7 @@ from enum import Enum
 import itertools
 from L0.ishell import IShell
 from L1.lower.argparse import common_pattern_parser
+from common import ui_tools
 
 GREP_RC_NO_RES = 1
 
@@ -22,6 +23,10 @@ class Grep(IProgram):
     CALLER_SEPARATOR = '='
     
     def _run_prog(self, **kwargs):
+        kwargs['pattern'] = kwargs['pattern'] or '.*'
+        if kwargs.get('text', ''):
+            return self.pygrep(**kwargs)
+
         no_color = self.__grep_base_no_color(**kwargs)
         colored = self.__grep_base_colored(**kwargs)
 
@@ -40,7 +45,23 @@ class Grep(IProgram):
 
         return self.__grep_base_no_color(extra_flags=extra_flags, **kwargs)
 
-    def __grep_base_no_color(self, pattern, git, text, files, wildness, context, extra_flags, case_sensitive, whole_word, exclude_files, invert, untracked):
+    def pygrep(self, pattern, text, files, wildness, case_sensitive, whole_word, invert, lines, text_colored, **ignorable):
+        res = SearchRes()
+
+        for i, t in enumerate(text):
+            any_pattern = False
+            for p in pattern:
+                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
+                if bool(compiled.search(t)) != invert:
+                    any_pattern = True
+                    pattern_colored = ui_tools.colored(p, key='text')
+                    with_color = compiled.sub(pattern_colored, text_colored[i])
+            if any_pattern:
+                res.add_record(path=files[i], line=lines[i], text=t, text_colored=with_color)
+
+        return res 
+
+    def __grep_base_no_color(self, pattern, git, text, files, wildness, context, extra_flags, case_sensitive, whole_word, exclude_files, invert, untracked, lines=None, text_colored=None):
         IGNORE_BIN_FILES = '-I'
         SHOW_FILE_LINE = '-n'
         REGEX_SEARCH = '-E'
@@ -98,9 +119,8 @@ class Grep(IProgram):
     def arg_parser(cls, parent):
         grep_parser = cls._add_command_parser(parent, 'grep', aliases='g', parents=[
                                             common_pattern_parser()], help='grep operations (note: searches git repo by default)')
-        grep_parser.add_argument(
-            '-w', '--whole-word', help='grep for whole word', action='store_true', default=False)
         inputs = grep_parser.add_mutually_exclusive_group()
+        # TODO git/untracked should be supported by find too
         inputs.add_argument('-g', '--git', help='Search files within the git repo',
                             action='store_true', dest='git', default=True)
         inputs.add_argument(
@@ -113,8 +133,6 @@ class Grep(IProgram):
         inputs.add_argument('-P', '--no-context', help='DO NOT grab context for the result', action='store_false', dest='context')
         grep_parser.add_argument('--exclude-files', nargs='*', type=str,
                                  help='file patterns to exclude', default=['*.pdf'])  # Breaks encoding
-        grep_parser.add_argument(
-            '-v', '--invert', action='store_true', help='invert match (like grep -v)')
 
 class InlineSeparator(Enum):
     CALLER = '='

@@ -51,6 +51,13 @@ class IVirt(IProgram):
         '''
         if self.prev_output.is_empty(): # #1
             return self._underlying_prog.run(**kwargs)
+        else:
+            kwargs['text'] = self.prev_output.texts
+            kwargs['lines'] = self.prev_output.lines
+            kwargs['files'] = self.prev_output.paths
+            kwargs['text_colored'] = self.prev_output.texts_colored
+            self._underlying_prog.run(**kwargs)
+            return self._underlying_prog.output 
 
         prev_files = self.prev_output.paths
 
@@ -60,8 +67,10 @@ class IVirt(IProgram):
         else:
             kwargs['files'] = prev_files
 
+        lines = self.prev_output.lines
+
         # Run new prog
-        self._underlying_prog.run(**kwargs)
+        self._underlying_prog.run(lines=lines, **kwargs)
         new_output = self._underlying_prog.output
 
         # Now we need a different solution for #1 vs #2:

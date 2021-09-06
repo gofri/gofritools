@@ -27,7 +27,7 @@ def verbose_print(data, min_verbosity=VERBOSE_1):
 def verbose_print_cmd(cmd, label=''):
     oneline = ' '.join((f"'{x}'" if i>0 else x for i, x in enumerate(cmd)))
     oneline = ui_tools.colored(oneline, bg='lightblue_ex')
-    verbose_print(f'{label} Executing: {cmd} == \n{oneline}', VERBOSE_3)
+    verbose_print(f'{label} Executing: {cmd} == \n{oneline}', VERBOSE_2)
 
 
 def print_to_stderr(data, color='red', verbose_prefix=True):
