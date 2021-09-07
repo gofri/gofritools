@@ -224,7 +224,7 @@ def collect_bin_stdin():
     if not is_pipe(sys.stdin):
         raise NoPipe()
 
-    return utils.depicklize_file(sys.stdin.buffer)
+    return depicklize_file(sys.stdin.buffer)
 
 def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
     pattern = rf'\b{pattern}\b' if whole_word else pattern

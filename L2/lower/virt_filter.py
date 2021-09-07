@@ -41,17 +41,16 @@ class TextFilter(BasicFilter):
         return bool(self.compiled.search(data)) != self.invert
 
     def post_did_match(self, index, data, virt_filter):
-        # TODO bug: might turn letter from capital to non or vice versa when used with -i
-        #           harder than one would think... need to:
-        #           1. clone the org text_colored
-        #           2. finditer(data)
-        #           3. for each iter:
-        #               colored = sub(clone[till_this_part:])
-        #               clone = clone[:till this part] + colored
-        #           4. text_colored[i] = clone
-        pattern_colored = ui_tools.colored(self.pattern, key='text')
-        virt_filter.text_colored[index] = self.compiled.sub(pattern_colored, virt_filter.text_colored[index])
-
+        ''' mark the text '''
+        org = virt_filter.text_colored
+        org_line = org[index]
+        matches = self.compiled.finditer(org_line)
+        offset = 0
+        for m in reversed(list(matches)):
+            with_color = ui_tools.colored(m.group(), key='text')
+            start, end = m.span()
+            colored_match = self.compiled.sub(with_color, org_line[start:end])            
+            org[index] = org_line[:start] + colored_match + org_line[end:] 
 ###
 
 class Filteree(Enum):
