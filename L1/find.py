@@ -26,6 +26,7 @@ class Find(IProgram):
         #   * a whole-word is, by nature, the entire base name.
         #     "by nature", rather than by definition: if the directive is e.g. wierd-file+name.txt,
         #     then whole word will not work properly here, since e.g. 'wierd' is a valid whole-word here.
+        #     This is not a problem when find always searches for filename/dir rather than entire path
         #     
         #   * THE REAL FIND (this function) should be heavily adjusted accordingly. 
         if whole_word:
@@ -104,6 +105,5 @@ class Find(IProgram):
         #       a. empty --suffix: -not pattern without suffix (no need to re-filter-in suffix)
         #       b. non-empty --suffix: -not pattern with suffix (re-filter-in suffix)
         #       c. non-empty --invert-suffix: -not pattern with any suffix, filter-out by suffix
-        # TODO also need to add the suffix support to the new py-native virt version
         suffix_options.add_argument(
             '-S', '--no-suffix', action='store_false', dest='suffix', help='No file extension')
