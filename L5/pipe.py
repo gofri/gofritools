@@ -1,4 +1,4 @@
-from L5 import BatchMode
+from L5.batch import BatchMode
 
 class PipeMode(BatchMode):
     def __init__(self, *args, **kwargs):
