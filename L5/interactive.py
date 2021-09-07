@@ -53,7 +53,7 @@ class InteractiveMode(IOpMode):
                     info = True
                     logging.print_warning(e)
                     if logging.global_verbosity > 1:
-                        logging.log_ex()  # TODO this is ugly
+                        logging.log_ex()
 
                 if cmd_res:
                     if not (self.__verbosity or info):

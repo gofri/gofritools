@@ -7,6 +7,7 @@ from common import utils
 from common.res import SearchRes
 from common import ui_tools
 from enum import Enum, auto
+import pathlib
 
 from L1.find import join_suffix
 
@@ -38,7 +39,7 @@ class PathFilter(BasicFilter):
         self.suffix = suffix
     
     def match(self, data):
-        parts = data.split('/') # XXX: broken for slash in file name 
+        parts = pathlib.Path(data).parts
         path, basename = parts[:-1], parts[-1]
         filename, filext = os.path.splitext(basename)
         suffix_compiled = re.compile(join_suffix(self.suffix))
@@ -51,7 +52,7 @@ class PathFilter(BasicFilter):
         suffix_valid = suffix_compiled.match(filext)
         print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
 
-        return parts_valid and suffix_valid
+        return bool(parts_valid and suffix_valid) != self.invert
 
     @classmethod
     def default_pattern(cls, pattern):

@@ -17,7 +17,6 @@ class Find(IProgram):
     SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
     def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
         pattern = pattern or ['[^\.]*']
-        # TODO whole_word
         # TODO more generally, find should behave like grep, by means that:
         #   * search, rather than match (see note below).
         #   * search is done on the basename, excluding the suffix.
