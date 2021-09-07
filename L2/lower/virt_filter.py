@@ -5,6 +5,8 @@ from common.res import SearchRes
 from common import ui_tools
 from enum import Enum, auto
 
+from L1.find import join_suffix
+
 import os
 
 class BasicFilter(object):
@@ -14,7 +16,7 @@ class BasicFilter(object):
         self.case_sensitive = case_sensitive
         self.whole_word = whole_word
         self.invert = invert
-        self.compiled = utils.compile_re(pattern, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
+        self.compiled = self.compile(self.pattern)
 
     def match(self, *args, **kwargs):
         raise NotImplementedError()
@@ -22,19 +24,37 @@ class BasicFilter(object):
     def post_did_match(self, *args, **kwargs):
         pass
 
+    @classmethod
+    def default_pattern(cls, pattern):
+        return pattern # empty == none
+
+    def compile(self, pattern):
+        return utils.compile_re(pattern, wildness=self.wildness, case_sensitive=self.case_sensitive, whole_word=self.whole_word)
+
 class PathFilter(BasicFilter):
-    def __init__(self, /, *args, suffix, **kwargs):
-        BasicFilter.__init__(self, *args, **kwargs)
+    def __init__(self, pattern, /, *args, suffix, **kwargs):
+        BasicFilter.__init__(self, pattern, *args, **kwargs)
         self.suffix = suffix
     
     def match(self, data):
         parts = data.split('/') # XXX: broken for slash in file name 
         path, basename = parts[:-1], parts[-1]
-        filename, fileext = os.path.splitext(basename)
+        filename, filext = os.path.splitext(basename)
+        suffix_compiled = self.compile(join_suffix(self.suffix))
 
-        # TODO implement find.py rules 
-        
-        return bool(self.compiled.search(data)) != self.invert
+        searches = [filename]
+        if self.wildness >= 1:
+            searches += parts[:-1] # filename + all dir directives 
+
+        parts_valid = any(self.compiled.search(p) for p in searches)
+        suffix_valid = suffix_compiled.match(filext)
+        # print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
+
+        return parts_valid and suffix_valid
+
+    @classmethod
+    def default_pattern(cls, pattern):
+        return pattern or ['[^\.]*']
 
 class TextFilter(BasicFilter):
     def match(self, data):
@@ -51,6 +71,10 @@ class TextFilter(BasicFilter):
             start, end = m.span()
             colored_match = self.compiled.sub(with_color, org_line[start:end])            
             org[index] = org_line[:start] + colored_match + org_line[end:] 
+
+    @classmethod
+    def default_pattern(cls, pattern):
+        return pattern or ['.*']
 ###
 
 class Filteree(Enum):
@@ -62,8 +86,13 @@ class Filteree(Enum):
         return options[self]
     
     def get_filter(self, *args, **kwargs):
+        filter_type = self.get_filter_type()
+        return filter_type(*args, **kwargs)
+
+    def get_filter_type(self):
         options = {self.TEXT:TextFilter, self.PATH:PathFilter}
-        return options[self](*args, **kwargs)
+        return options[self]
+
     
 ###
 
@@ -77,6 +106,7 @@ class VirtualFilter(object):
         self.filteree = filteree
 
     def filter(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
+        pattern = self.filteree.get_filter_type().default_pattern(pattern)
         res = SearchRes()
         filteree = self.filteree.get_relevant_filteree(text=self.text, paths=self.paths)
         for i, t in enumerate(filteree):

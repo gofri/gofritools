@@ -7,9 +7,16 @@ from common.res import SearchRes
 from L1.lower.argparse import common_pattern_parser
 
 
+def join_suffix(suffix):
+    if suffix:
+        return '(\.(' + '|'.join(suffix) + '))$'
+    else:
+        return '$'
+
 class Find(IProgram):
     SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
     def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
+        pattern = pattern or ['[^\.]*']
         # TODO whole_word
         # TODO more generally, find should behave like grep, by means that:
         #   * search, rather than match (see note below).
@@ -33,10 +40,7 @@ class Find(IProgram):
         pattern = [self.__with_regex_prefix(p) for p in pattern]
 
         # add suffix
-        if suffix:
-            suffix = '(\.(' + '|'.join(suffix) + '))$'
-        else:
-            suffix = '$'
+        suffix = join_suffix(suffix)
         pattern = [p + suffix for p in pattern]
 
         regextype = ['-regextype', 'egrep']

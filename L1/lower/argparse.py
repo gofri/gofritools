@@ -75,7 +75,7 @@ def common_pattern_parser():
     ''' Common flags for cmds with a pattern '''
     common_pattern = argparse.ArgumentParser(add_help=False)
     common_pattern.add_argument(
-        'pattern', help='The pattern to test', default=['.*'], nargs='*')
+        'pattern', help='The pattern to test', default=None, nargs='*')
     common_pattern.add_argument('-i', '--case-insensitive', dest='case_sensitive',
                                 help='Case sevsitive search (insensitive by default)', action='store_false', default=True)
     common_pattern.add_argument('-@', '--wildness', help='Use incrementally wilder search (1=surround by wildcards. 2=convention variations)',

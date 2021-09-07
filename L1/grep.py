@@ -23,6 +23,7 @@ class Grep(IProgram):
     CALLER_SEPARATOR = '='
     
     def _run_prog(self, **kwargs):
+        kwargs['pattern'] = kwargs['pattern'] or '.*'
         if kwargs.get('text', ''):
             return self.pygrep(**kwargs)
 
