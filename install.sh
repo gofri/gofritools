@@ -9,6 +9,8 @@ BRANCH="${BRANCH:-master}"
 PULL_DOCKERHUB=${PULL_DOCKERHUB:-1}
 PULL_REPO=${PULL_REPO:-1}
 
+LOCAL_SHORTCUTS_ONLY=${LOCAL_SHORTCUTS_ONLY:-0}
+
 try_install_docker() {
     if grep -qi 'red hat' /etc/os-release; then
         sudo yum install -y podman && return 0
@@ -53,31 +55,34 @@ main() {
         exit 1
     fi
 
-    # Cleanup
-    $engine stop ${CONTAINER_NAME}
-    $engine rm ${CONTAINER_NAME}
-    $engine rmi ${IMAGE_NAME}
+    if $LOCAL_SHORTCUTS_ONLY -eq 0; then
 
-    # Build
-    if test $PULL_DOCKERHUB -eq 1 && ${engine} pull ${DOCKERHUB_IMAGE}:latest; then
-        IMAGE_NAME=${DOCKERHUB_IMAGE}
-    else
-        if test $PULL_DOCKERHUB -ne 1; then
-            echo "Failed to pull -- let's build;"
-        fi
-        if test $PULL_REPO -eq 0; then
-            $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}"
-        elif test "$engine" = "docker"; then
-            $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
+        # Cleanup
+        $engine stop ${CONTAINER_NAME}
+        $engine rm ${CONTAINER_NAME}
+        $engine rmi ${IMAGE_NAME}
+
+        # Build
+        if test $PULL_DOCKERHUB -eq 1 && ${engine} pull ${DOCKERHUB_IMAGE}:latest; then
+            IMAGE_NAME=${DOCKERHUB_IMAGE}
         else
-            tmpdir=$(mktemp -d)
-            (
-                cd $tmpdir
-                git clone -b $BRANCH $REPO tmp_repo 
-                cd tmp_repo 
-                $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}" .
-            )
-            rm -rf $tmpdir
+            if test $PULL_DOCKERHUB -ne 1; then
+                echo "Failed to pull -- let's build;"
+            fi
+            if test $PULL_REPO -eq 0; then
+                $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}"
+            elif test "$engine" = "docker"; then
+                $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}" "${REPO}#${BRANCH}"
+            else
+                tmpdir=$(mktemp -d)
+                (
+                    cd $tmpdir
+                    git clone -b $BRANCH $REPO tmp_repo 
+                    cd tmp_repo 
+                    $engine build --no-cache --build-arg branch=${BRANCH} -t "${IMAGE_NAME}" .
+                )
+                rm -rf $tmpdir
+            fi
         fi
     fi
 
@@ -87,14 +92,14 @@ main() {
     start_script="${engine} run -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --detach --privileged -v /:/mnt/root --workdir /mnt/root\$(pwd) --name ${CONTAINER_NAME} ${IMAGE_NAME} bash"
     resume_script="${engine} start ${CONTAINER_NAME}"
     __exec_script="${engine} exec -it --workdir /mnt/root\$(pwd) ${CONTAINER_NAME}"
-    exec_script="${engine} exec -it --workdir /mnt/root\$(pwd) ${CONTAINER_NAME} gofritools \"\$@\""
+    exec_script="${__exec_script} gofritools \"\$@\""
     chmod +x "${UTIL}"
 
     (
         cd $INSTALL_DIR
         echo "$exec_script" > "${UTIL_NAME}"
-        echo "${UTIL_NAME} b \"\$@\"" > gof
-        echo "${UTIL_NAME} i \"\$@\"" > gi
+        echo "if test -p /dev/stdout; then mode=p; else mode=b; fi; ${UTIL_NAME} \${mode} \"\$@\"" > gof
+        echo "${UTIL_NAME} i \"\$@\"" > gofi
         echo "${UTIL_NAME} i g \"\$@\"" > gg
         echo "${UTIL_NAME} i f \"\$@\"" > ff
         echo "$start_script 2>/dev/null || $resume_script" > gof-start

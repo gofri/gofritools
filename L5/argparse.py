@@ -33,7 +33,7 @@ def mode_parser(parser):
     subparsers = parser.add_subparsers(dest='mode', required=True)
     parsers = {}
 
-    for p in ('interactive', 'batch'):
+    for p in ('interactive', 'batch', 'pipe'):
         parsers[p] = add_mode_parser(subparsers, p, aliases=[p[0]], help=f'{p.capitalize()} mode')
 
     return parsers

@@ -8,6 +8,7 @@ class OpModeFactory(IFactory):
     OP_MODES= {
         'interactive': InteractiveMode,
         'batch': BatchMode,
+        'pipe': PipeMode,
     }
 
     def __init__(self, stack, cmdline=None):
