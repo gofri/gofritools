@@ -1,13 +1,14 @@
 #!/usr/bin/python3
 # encoding: utf-8
+import re
+import os
+
 from common import utils
 from common.res import SearchRes
 from common import ui_tools
 from enum import Enum, auto
 
 from L1.find import join_suffix
-
-import os
 
 class BasicFilter(object):
     def __init__(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
@@ -40,7 +41,7 @@ class PathFilter(BasicFilter):
         parts = data.split('/') # XXX: broken for slash in file name 
         path, basename = parts[:-1], parts[-1]
         filename, filext = os.path.splitext(basename)
-        suffix_compiled = self.compile(join_suffix(self.suffix))
+        suffix_compiled = re.compile(join_suffix(self.suffix))
 
         searches = [filename]
         if self.wildness >= 1:
@@ -48,7 +49,7 @@ class PathFilter(BasicFilter):
 
         parts_valid = any(self.compiled.search(p) for p in searches)
         suffix_valid = suffix_compiled.match(filext)
-        # print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
+        print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
 
         return parts_valid and suffix_valid
 
