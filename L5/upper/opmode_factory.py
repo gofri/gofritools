@@ -3,6 +3,7 @@ from L5 import argparse
 
 from L5.interactive import InteractiveMode
 from L5.batch import BatchMode
+from L5.pipe import PipeMode
 
 class OpModeFactory(IFactory):
     OP_MODES= {
