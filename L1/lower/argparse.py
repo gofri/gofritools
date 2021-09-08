@@ -106,7 +106,6 @@ class FileLine(object):
 
 
 def common_pattern_parser_partial():
-    # TODO need to make it more elegant
     common_pattern = argparse.ArgumentParser(add_help=False)
     common_pattern.add_argument(
         'pattern', help='The pattern to test', default=None, nargs='*')
