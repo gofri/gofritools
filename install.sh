@@ -55,9 +55,10 @@ main() {
         exit 1
     fi
 
-    if $LOCAL_SHORTCUTS_ONLY -eq 0; then
+    if test $LOCAL_SHORTCUTS_ONLY -eq 0; then
 
         # Cleanup
+        echo "cleanup:"
         $engine stop ${CONTAINER_NAME}
         $engine rm ${CONTAINER_NAME}
         $engine rmi ${IMAGE_NAME}
@@ -112,6 +113,7 @@ main() {
 
     # Kick-off
     gof-start
+    gof-update # OTS image is often outdated due to registry delays
 }
 
 main "$@"
