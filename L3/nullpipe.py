@@ -1,19 +1,19 @@
 from L3.lower.ipipe import IPipe
-from L1.lower.results.search_result import SearchRes
+from L1.lower.results.search_result import SearchResult
 
 
 class NullPipe(IPipe):
     ''' A pipe that does not care about input args and always returns an empty result. '''
 
     def __init__(self, *_, **__):
-        IPipe.__init__(self, SearchRes())
+        IPipe.__init__(self, SearchResult())
 
     def run(self, args_ns):
         return self.output
 
     @property
     def output(self):
-        return SearchRes()
+        return SearchResult()
 
     def refresh(self, input_):
         return self.output

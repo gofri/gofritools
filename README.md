@@ -64,7 +64,7 @@ wget -O - https://git.io/JqxIH | bash
 
 ## argparse options
 [REAL] = [real programs and general flags]
-[VIRT] = [select/element/etc.] << the options depend on the specific type of Result in stdin (SearchRes/GitCommit/etc.)
+[VIRT] = [select/element/etc.] << the options depend on the specific type of Result in stdin (SearchResult/GitCommit/etc.)
 [INTERACTIVE] = [stepb/stepf/etc.]
 [MEDIUM] = [interactive/batch]
 

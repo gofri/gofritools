@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import enum
-from L1.lower.results.search_result import SearchRes
+from L1.lower.results.search_result import SearchResult
 from L1.lower.argparse import common_pattern_parser_partial
 from enum import Enum, auto
 from L1.lower.iprogram import IProgram
@@ -58,7 +58,7 @@ class GQL(IProgram):
     def _run_prog(self, data, query):
         tester = GqlRecordTester(query)
         new_data = list(filter(tester.test, data.records))
-        return SearchRes(records=new_data)
+        return SearchResult(records=new_data)
 
     # XXX: implement prompt-for-empty-query on virt_ level    
     @classmethod

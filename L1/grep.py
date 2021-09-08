@@ -4,7 +4,7 @@
 from common import utils, logging
 from common.utils import in_kwargs
 from L1.lower.iprogram import IProgram
-from L1.lower.results.search_result import SearchRes
+from L1.lower.results.search_result import SearchResult
 from enum import Enum
 import itertools
 from L0.ishell import IShell
@@ -46,7 +46,7 @@ class Grep(IProgram):
         return self.__grep_base_no_color(extra_flags=extra_flags, **kwargs)
 
     def pygrep(self, pattern, text, files, wildness, case_sensitive, whole_word, invert, lines, text_colored, **ignorable):
-        res = SearchRes()
+        res = SearchResult()
 
         for i, t in enumerate(text):
             any_pattern = False
@@ -200,7 +200,7 @@ class Parsing(object):
     def parse_with_func_ctx(self, output, output_colored):
         res = output.splitlines()
         res_colored = output_colored.splitlines()
-        parsed = SearchRes()
+        parsed = SearchResult()
         self.cur_file = None
 
         for i, line in enumerate(res):

@@ -1,15 +1,9 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-from abc import ABC, abstractmethod
-from builtins import classmethod
 from common.stringification import Stringification
-from common import utils, git, logging
-from common.git.types import Repo
-
-
-class IRes(ABC):
-    pass
+from common import utils, logging
+from L1.lower.results.iresult import IResult
 
 class Record(object):
     def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
@@ -27,7 +21,7 @@ class Record(object):
         self.is_decl = is_decl
 
     @classmethod
-    def default_of(cls, d):
+    def __default_of(cls, d):
         return cls().get(d)
 
     # TODO this should be part of the interface for IRes.Record
@@ -52,7 +46,7 @@ class Record(object):
             if k in elements:
                 new_dict[k] = v
             else:
-                new_dict[k] = self.default_of(k)
+                new_dict[k] = self.__default_of(k)
         self.__dict__ = new_dict
 
     def jsonize(self):
@@ -80,9 +74,7 @@ class Record(object):
         return True
 
 
-class SearchRes(IRes):
-
-    # TODO The rest of the SearchRes code is below, move Record outa here.
+class SearchResult(IResult):
     def __init__(self, records=None):
         self._records = records or []
     @property
@@ -119,7 +111,7 @@ class SearchRes(IRes):
     @classmethod
     def from_dicts(cls, l):
         records = [Record.from_dict(d) for d in l]
-        return SearchRes(records)
+        return SearchResult(records)
 
     def keep_indices(self, indices, to_omit=None):
         to_omit = to_omit or ()
@@ -145,7 +137,7 @@ class SearchRes(IRes):
             def sort_func(r):
                 new = []
                 for d in elements:
-                    s = r.get(d, Record.default_of(d))
+                    s = r.get(d, Record.__default_of(d))
                     if isinstance(s, str) and trim_on_sort:
                         s = s.strip()
                     new.append(s)
@@ -194,10 +186,6 @@ class SearchRes(IRes):
 
     def __str__(self):
         if self.is_empty():
-            return f'<Empty SearchRes>'
+            return f'<Empty SearchResult>'
         else:
-            return f'<SearchRes with {self.records_count} records>'
-
-class GitResult(IRes):
-    def __init__(self, repo):
-        self.repo = repo
+            return f'<SearchResult with {self.records_count} records>'

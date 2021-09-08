@@ -3,7 +3,7 @@
 
 from common import utils, ui_tools, logging
 from L1.lower.iprogram import IProgram
-from L1.lower.results.search_result import SearchRes
+from L1.lower.results.search_result import SearchResult
 from L1.lower.argparse import common_pattern_parser
 
 
@@ -74,7 +74,7 @@ class Find(IProgram):
         matches = self.__remove_leading_cur_dir(matches)
         matches = utils.unify_paths(matches)
 
-        res = SearchRes.from_dicts([{'path':match} for match in matches])
+        res = SearchResult.from_dicts([{'path':match} for match in matches])
 
         return res
 

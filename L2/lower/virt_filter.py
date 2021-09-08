@@ -4,7 +4,7 @@ import re
 import os
 
 from common import utils
-from L1.lower.results.search_result import SearchRes
+from L1.lower.results.search_result import SearchResult
 from common import ui_tools
 from enum import Enum, auto
 import pathlib
@@ -110,7 +110,7 @@ class VirtualFilter(object):
 
     def filter(self, pattern, **ignorable):
         pattern = self.filteree.get_filter_type().default_pattern(pattern)
-        res = SearchRes()
+        res = SearchResult()
         filteree = self.filteree.get_relevant_filteree(text=self.text, paths=self.paths)
         for i, t in enumerate(filteree):
             any_pattern = False
