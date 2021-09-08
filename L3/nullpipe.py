@@ -1,5 +1,5 @@
 from L3.lower.ipipe import IPipe
-from common.res import SearchRes
+from L1.lower.results.search_result import SearchRes
 
 
 class NullPipe(IPipe):

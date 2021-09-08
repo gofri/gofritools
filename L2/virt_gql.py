@@ -25,7 +25,7 @@ class GqlCompletion(object):
     def __list_record_fields(self):
         # TODO this should be replaced with a gql-based functionality.
         # In addition, stuff like path.<TAB> should yield gql-based funcs (StrField, PathField, etc.)
-        from common.res import Record
+        from L1.lower.results.search_result import Record
         return list(vars(Record()).keys())
 
     def register(self):

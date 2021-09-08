@@ -4,7 +4,7 @@ import re
 import os
 
 from common import utils
-from common.res import SearchRes
+from L1.lower.results.search_result import SearchRes
 from common import ui_tools
 from enum import Enum, auto
 import pathlib

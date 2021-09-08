@@ -4,7 +4,7 @@
 from common import utils, logging
 from common.utils import in_kwargs
 from L1.lower.iprogram import IProgram
-from common.res import SearchRes
+from L1.lower.results.search_result import SearchRes
 from enum import Enum
 import itertools
 from L0.ishell import IShell

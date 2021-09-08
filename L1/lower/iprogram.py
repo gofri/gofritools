@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 from abc import abstractmethod
-from common import utils, res
+from common import utils
 from common.utils import SimpleCache
 from common.argparse import add_sub_parser
 

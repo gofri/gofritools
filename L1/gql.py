@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 import enum
-from common.res import SearchRes
+from L1.lower.results.search_result import SearchRes
 from L1.lower.argparse import common_pattern_parser_partial
 from enum import Enum, auto
 from L1.lower.iprogram import IProgram
