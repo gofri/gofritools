@@ -30,6 +30,7 @@ class Record(object):
     def default_of(cls, d):
         return cls().get(d)
 
+    # TODO this should be part of the interface for IRes.Record
     def get(self, key, default=None):
         try:
             return vars(self)[key]
@@ -116,7 +117,7 @@ class SearchRes(IRes):
         self.records.append(r)
 
     @classmethod
-    def from_list(cls, l):
+    def from_dicts(cls, l):
         records = [Record.from_dict(d) for d in l]
         return SearchRes(records)
 

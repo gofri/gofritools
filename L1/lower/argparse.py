@@ -1,5 +1,6 @@
 import argparse
 from common import ui_tools
+from common import utils
 
 class FileLine(object):
     SEPARATOR = ':'
@@ -71,8 +72,41 @@ class FileLine(object):
     def __repr__(self):
         return str(self)
 
-def common_pattern_parser():
-    ''' Common flags for cmds with a pattern '''
+    class LoopStop: pass
+    class LoopEnter: pass
+    @classmethod
+    def _loop_prompt(cls):
+        while True:
+            print(f'Press enter to continue, s/stop to stop')
+            choice = input().strip()
+            if choice in ('s', 'stop'):
+                return cls.LoopStop
+            elif choice == '':
+                return cls.LoopEnter
+            else:
+                print('Invalid choice.')
+
+    @classmethod
+    def interactive_file_series(cls, pairs, hook, do_reverse=False):
+        files = [p.file for p in pairs]
+        with utils.MultipleFiles(files):
+            pairs = FileLine.as_safe_list(pairs, sorted_=do_reverse)
+            if len(pairs) == 1:
+                hook(pairs[0])
+            else:
+                for p in pairs:
+                    print(f'Showing {ui_tools.highlight(p)}')
+                    choice = cls._loop_prompt()
+                    if choice == cls.LoopStop:
+                        print('stopped.')
+                        return
+                    elif choice == cls.LoopEnter:
+                        hook(p)
+                print('done.')
+
+
+def common_pattern_parser_partial():
+    # TODO need to make it more elegant
     common_pattern = argparse.ArgumentParser(add_help=False)
     common_pattern.add_argument(
         'pattern', help='The pattern to test', default=None, nargs='*')
@@ -80,6 +114,11 @@ def common_pattern_parser():
                                 help='Case sevsitive search (insensitive by default)', action='store_false', default=True)
     common_pattern.add_argument('-@', '--wildness', help='Use incrementally wilder search (1=surround by wildcards. 2=convention variations)',
                                 action='count', default=0)
+    return common_pattern
+
+def common_pattern_parser():
+    ''' Common flags for cmds with a pattern '''
+    common_pattern = common_pattern_parser_partial()
     common_pattern.add_argument(
         '-f', '--files', help='Limit the operation to specific files / directories', type=str, nargs='+', default=[])
     common_pattern.add_argument(

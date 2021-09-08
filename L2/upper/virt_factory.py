@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
+from L2.virt_gql import VirtGql
 from L2.virt_grep import VirtGrep
 from L2.virt_find import VirtFind
 from L2.virt_vim import VirtVim
@@ -27,6 +28,7 @@ class VirtFactory(ProgramFactory):
         'trim': VirtTrim,
         'element': VirtElement,
         'difftool': VirtDifftool,
+        'gql': VirtGql,
     }
 
     def __init__(self, prev_output, shell_name=None):

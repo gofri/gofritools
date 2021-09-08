@@ -28,8 +28,8 @@ class Vim(IProgram):
             vim_cmd = ['vim', '-R']
         else:
             vim_cmd = ['vim']
-        with utils.MultipleFiles(files):
-            if view_mode in ('c', 'combo'):
+        if view_mode in ('c', 'combo'):
+            with utils.MultipleFiles(files):
                 if do_reverse:
                     pairs = list(reversed(pairs))
                 # XXX: The first arg file is passed differently (w/o vsp & as distinct args for file and line).
@@ -42,16 +42,11 @@ class Vim(IProgram):
                 args = first_file_args + rest_files_args
                 self.ishell.interactive_cmd(vim_cmd + args)
 
-            elif view_mode in ('s', 'series'):
-                pairs = FileLine.as_safe_list(pairs, sorted_=do_reverse)
-                for p in pairs:
-                    if len(pairs) > 1: # make default=series hidden when n_files=1
-                        print(
-                            f'Showing {ui_tools.highlight(p)} | Press enter to continue, s/stop to stop')
-                        if input() in ('s', 'stop'):
-                            break
-                    args = [p.file, f'+{self.__fix_default_line(p.line)}']
-                    self.ishell.interactive_cmd(vim_cmd + args)
+        elif view_mode in ('s', 'series'):
+            def hook(p):
+                args = [p.file, f'+{self.__fix_default_line(p.line)}']
+                self.ishell.interactive_cmd(vim_cmd + args)
+            FileLine.interactive_file_series(pairs, hook, do_reverse)
 
     def __fix_default_line(self, line):
         return line or '0'

@@ -1,5 +1,6 @@
 #!//bin/python3
 # encoding: utf-8
+
 from common.logging import verbose_print
 from common.ifactory import IFactory
 from L0.shell_factory import ShellFactory
@@ -15,6 +16,7 @@ from L1.select import Select
 from L1.element import Element
 from L1.difftool import Difftool
 from L1.trim import Trim
+from L1.gql import GQL
 
 class ProgramFactory(IFactory):
     PROGRAMS = {
@@ -29,6 +31,7 @@ class ProgramFactory(IFactory):
         'element': Element,
         'difftool': Difftool,
         'trim': Trim,
+        'gql': GQL,
     }
 
     def __init__(self, shell_name=None):

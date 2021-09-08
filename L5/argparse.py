@@ -39,7 +39,7 @@ def mode_parser(parser):
     return parsers
 
 def add_commands_parser(parser, interactive, virt, required):
-    # TODO interactive/virt ==> will move naturally when each layer exports its argparse
+    # TODO move this argparsing to virt layer 
     subparsers = parser.add_subparsers(dest='command', required=virt)
 
     ProgramFactory.arg_parser(subparsers)
@@ -77,6 +77,7 @@ def colorize_match(match):
 def match_sort_key(match):
     return (match_to_key(match), match)
 
+# TODO also need to make this an infra
 g_prompt = '' # TODO replace functions here with staefull class instead of using global
 def display_completion_func(substitution, matches, longest_match_length):
     global g_prompt

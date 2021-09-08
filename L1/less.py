@@ -3,7 +3,7 @@
 from common import utils
 from L1.lower.iprogram import IProgram
 import argparse
-from L1.lower.argparse import common_file_line_parser
+from L1.lower.argparse import common_file_line_parser, FileLine
 
 
 class Less(IProgram):
@@ -12,15 +12,10 @@ class Less(IProgram):
         self.__open_multiple_files(pairs)
 
     def __open_multiple_files(self, pairs):
-        files = [p.file for p in pairs]
-        with utils.MultipleFiles(files):
-            for p in pairs:
-                print(
-                    f'Showing {p} | Press enter to continue, s/stop to stop')
-                if input() in ('s', 'stop'):
-                    break
-                args = [f'+{self.__fix_default_line(p.line)}', p.file]
-                self.ishell.interactive_cmd(['less'] + args)
+        def hook(p):
+            args = [f'+{self.__fix_default_line(p.line)}', p.file]
+            self.ishell.interactive_cmd(['less'] + args)
+        FileLine.interactive_file_series(pairs, hook)
 
     def __fix_default_line(self, line):
         return line or '0'
