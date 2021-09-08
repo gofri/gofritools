@@ -34,9 +34,10 @@ class BasicFilter(object):
         return utils.compile_re(pattern, wildness=self.wildness, case_sensitive=self.case_sensitive, whole_word=self.whole_word)
 
 class PathFilter(BasicFilter):
-    def __init__(self, pattern, /, *args, suffix, **kwargs):
+    def __init__(self, pattern, /, *args, suffix, invert_suffix, **kwargs):
         BasicFilter.__init__(self, pattern, *args, **kwargs)
         self.suffix = suffix
+        self.invert_suffix = invert_suffix
     
     def match(self, data):
         parts = pathlib.Path(data).parts
@@ -50,9 +51,9 @@ class PathFilter(BasicFilter):
 
         parts_valid = any(self.compiled.search(p) for p in searches)
         suffix_valid = suffix_compiled.match(filext)
-        print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
+        # print(f'"{data}" for ({self.compiled.pattern},{suffix_compiled.pattern}): {parts_valid, suffix_valid}')
 
-        return bool(parts_valid and suffix_valid) != self.invert
+        return bool(parts_valid) != self.invert and bool(suffix_valid) != self.invert_suffix
 
     @classmethod
     def default_pattern(cls, pattern):
@@ -107,14 +108,14 @@ class VirtualFilter(object):
         self.lines = self.prev_output.lines
         self.filteree = filteree
 
-    def filter(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
+    def filter(self, pattern, **ignorable):
         pattern = self.filteree.get_filter_type().default_pattern(pattern)
         res = SearchRes()
         filteree = self.filteree.get_relevant_filteree(text=self.text, paths=self.paths)
         for i, t in enumerate(filteree):
             any_pattern = False
             for p in pattern:
-                _filter = self.filteree.get_filter(p, wildness, case_sensitive, whole_word, invert, **ignorable)
+                _filter = self.filteree.get_filter(p, **ignorable)
                 if _filter.match(t):
                     any_pattern = True
                     _filter.post_did_match(i, t, self)

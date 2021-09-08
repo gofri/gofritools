@@ -15,7 +15,7 @@ def join_suffix(suffix):
 
 class Find(IProgram):
     SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
-    def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False):
+    def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False, invert_suffix=False):
         pattern = pattern or ['[^\.]*']
         # TODO more generally, find should behave like grep, by means that:
         #   * search, rather than match (see note below).
@@ -107,3 +107,8 @@ class Find(IProgram):
         #       c. non-empty --invert-suffix: -not pattern with any suffix, filter-out by suffix
         suffix_options.add_argument(
             '-S', '--no-suffix', action='store_false', dest='suffix', help='No file extension')
+        invert_suffix_options = find_parser.add_mutually_exclusive_group()
+        invert_suffix_options.add_argument(
+            '--invert-suffix', action='store_true', dest='invert_suffix', help='invert search suffix')
+        invert_suffix_options.add_argument(
+            '--no-invert-suffix', action='store_false', dest='invert_suffix', help='invert search suffix')
