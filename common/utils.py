@@ -97,7 +97,6 @@ class ignore_failure(object):
 def jsonize(data):
     return json.dumps(data, indent=4, default=lambda self: self.__dict__)
 
-
 def dejsonize(json_str):
     return json.loads(json_str)
 
