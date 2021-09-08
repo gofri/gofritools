@@ -24,9 +24,6 @@ class Grep(IProgram):
     
     def _run_prog(self, **kwargs):
         kwargs['pattern'] = kwargs['pattern'] or '.*'
-        if kwargs.get('text', ''):
-            return self.pygrep(**kwargs)
-
         no_color = self.__grep_base_no_color(**kwargs)
         colored = self.__grep_base_colored(**kwargs)
 
@@ -44,22 +41,6 @@ class Grep(IProgram):
             del kwargs['extra_flags']
 
         return self.__grep_base_no_color(extra_flags=extra_flags, **kwargs)
-
-    def pygrep(self, pattern, text, files, wildness, case_sensitive, whole_word, invert, lines, text_colored, **ignorable):
-        res = SearchResult()
-
-        for i, t in enumerate(text):
-            any_pattern = False
-            for p in pattern:
-                compiled = utils.compile_re(p, wildness=wildness, case_sensitive=case_sensitive, whole_word=whole_word)
-                if bool(compiled.search(t)) != invert:
-                    any_pattern = True
-                    pattern_colored = ui_tools.colored(p, key='text')
-                    with_color = compiled.sub(pattern_colored, text_colored[i])
-            if any_pattern:
-                res.add_record(path=files[i], line=lines[i], text=t, text_colored=with_color)
-
-        return res 
 
     def __grep_base_no_color(self, pattern, git, text, files, wildness, context, extra_flags, case_sensitive, whole_word, exclude_files, invert, untracked, lines=None, text_colored=None):
         IGNORE_BIN_FILES = '-I'
