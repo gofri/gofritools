@@ -4,7 +4,7 @@
 class IResult(object):
     pass
 
-class IRecordable(object):
+class IRecordable(IResult):
     @property
     def records(self):
         pass
@@ -29,6 +29,6 @@ class IRecordable(object):
             i in indices or (i < 0 and (records_count+i) in indices))]
         self.set_records(records)
 
-class IFileLinable(object):
+class IFileLinable(IResult):
     def as_file_line_list(self):
         pass
