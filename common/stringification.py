@@ -4,10 +4,9 @@
 from common import ui_tools, utils
 from builtins import classmethod
 
-# TODO stringification is currently horrible.
-# need a refactor for the whole thing when proper L3/L4 are introduced
-# should behave somewhat like locale. this will enable e.g. csv/spreadsheet output more easily
 
+
+# TODO move (at least most of it) to search_result
 
 class Stringification(object):
     @classmethod

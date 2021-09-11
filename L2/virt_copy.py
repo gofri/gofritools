@@ -2,7 +2,6 @@
 # encoding: utf-8
 from L2.lower.ivirt import IVirt
 from L1.copy import Copy
-from common.stringification import Stringification
 from common import utils
 from L1.lower.results.search_result import SearchResult
 
@@ -20,6 +19,6 @@ class VirtCopy(IVirt):
 
     def __handle_result(self, **kwargs):
         kwargs['output_type'] = kwargs['output_type'] or utils.OutputTypes.raw
-        output = Stringification.stringify_by_args(self.prev_output, **kwargs)
+        output = self.prev_output.stringify_by_args(**kwargs)
         kwargs['text'] = output
         return self._underlying_prog.run(**kwargs)

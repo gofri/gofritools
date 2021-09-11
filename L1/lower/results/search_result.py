@@ -3,7 +3,7 @@
 
 from common.stringification import Stringification
 from common import utils, logging
-from L1.lower.results.iresult import IResult, IRecordable, IFileLinable
+from L1.lower.results.iresult import IResult, IRecordable, IFileLinable, IOutputable
 from L1.lower.fileline import FileLine
 
 class Record(object):
@@ -77,10 +77,11 @@ class Record(object):
                 return False
         return True
 
-class SearchResult(IRecordable, IFileLinable):
+class SearchResult(IRecordable, IFileLinable, IOutputable):
     def __init__(self, records=None):
         IRecordable.__init__(self)
         IFileLinable.__init__(self)
+        IOutputable.__init__(self)
         self._records = records or []
 
     # IRecordable
@@ -171,8 +172,7 @@ class SearchResult(IRecordable, IFileLinable):
         self._records = [
             r for r in self._records if r.get(element) in value_list]
 
-    """ SHORTCUTS functions for stuff that use self/self._records as arg """
-
+    # IOutputable
     def jsonize(self):
         return utils.jsonize(self._records)
 
@@ -188,11 +188,8 @@ class SearchResult(IRecordable, IFileLinable):
     def stringify_by_args(self, **kwargs):
         return Stringification.stringify_by_args(self, **kwargs)
 
-    def is_empty(self):
-        return not self.records
-
     def __str__(self):
-        if self.is_empty():
-            return f'<Empty SearchResult>'
-        else:
+        if self.records_count:
             return f'<SearchResult with {self.records_count} records>'
+        else:
+            return f'<Empty SearchResult>'

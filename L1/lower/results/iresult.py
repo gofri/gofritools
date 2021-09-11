@@ -32,3 +32,19 @@ class IRecordable(IResult):
 class IFileLinable(IResult):
     def as_file_line_list(self):
         pass
+
+class IOutputable(IResult):
+    def jsonize(self):
+        pass
+
+    def humanize(self):
+        pass
+
+    def raw_text(self):
+        pass
+
+    def picklize(self):
+        pass
+
+    def stringify_by_args(self, **kwargs):
+        pass
