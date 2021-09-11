@@ -54,12 +54,6 @@ def add_commands_parser(parser, interactive, virt, required, input_data):
                                             '<', ','], help='Go to stepb result')
         stepf_parser = add_command_parser(subparsers, 'stepf', aliases=[
                                             '>', '.'], help='Go to stepf result')
-    else:
-
-        # Passthrough command
-        passthrough_parser = add_command_parser(subparsers, 
-            'passthrough', aliases=['p'], help='ignore all args and print stdin')
-        passthrough_parser.add_argument('ignored-args', nargs='*')
 
     if required:
         subparsers.required = True
