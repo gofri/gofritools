@@ -73,7 +73,6 @@ class Record(object):
                 return False
         return True
 
-
 class SearchResult(IResult):
     def __init__(self, records=None):
         self._records = records or []

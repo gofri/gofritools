@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from L1.lower.iprogram import IProgram
+from L1.lower.results.iresult import IResult
 from abc import abstractmethod
 from common import utils
 from common.utils import SimpleCache

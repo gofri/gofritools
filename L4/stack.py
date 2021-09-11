@@ -2,6 +2,7 @@ from L4.lower.istack import IStack
 from L3.upper.pipe_factory import PipeFactory
 from L3.nullpipe import NullPipe
 from L1.lower.results.search_result import SearchResult
+from L1.lower.results.iresult import IResult
 from common import utils
 
 class Stack(IStack):
@@ -68,7 +69,7 @@ class Stack(IStack):
             raise RuntimeError('Unexpected underflow.')
 
     def refresh(self):
-        res = SearchResult()
+        res = IResult()
         for p in self.stack:
             res = p.refresh(res)
 
