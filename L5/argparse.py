@@ -143,7 +143,6 @@ def make_parser(interactive=False, virt=False, input_data=None):
     return parser
 
 def parse_args(parser, cmdline=None):
-    # Process arguments trick: use parse_known_args to enable ignoring multiple commands in a single line
     args = parser.parse_args(cmdline)
 
     # TODO use a standard count positive+negative
