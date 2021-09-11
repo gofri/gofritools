@@ -3,7 +3,8 @@
 from common import ui_tools, utils, logging
 from L1.lower.iprogram import IProgram
 import argparse
-from L1.lower.argparse import common_file_line_parser, FileLine
+from L1.lower.argparse import common_file_line_parser
+from L1.lower.fileline import FileLine
 
 class Vim(IProgram):
     def _run_prog(self, pairs, view_mode, readonly, reverse):

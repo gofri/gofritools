@@ -4,7 +4,7 @@
 from common.stringification import Stringification
 from common import utils, logging
 from L1.lower.results.iresult import IResult, IRecordable, IFileLinable
-from L1.lower.argparse import FileLine
+from L1.lower.fileline import FileLine
 
 class Record(object):
     def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
