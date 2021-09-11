@@ -39,9 +39,26 @@ class IVirt(IProgram):
         self.run(**self.kwargs)
         return self.output
 
+    def __find_action(self, input_data):
+        for input_type, action in self.action_map.items():
+            if isinstance(input_data, input_type):
+                return self.action_map[input_type]
+        return None
+
+    def can_handle(self, input_data):
+        return self.__find_action(input_data) is not None
+
+    @property
     @abstractmethod
+    def action_map(self):
+        pass
+
     def _run_virt(self, **kwargs):
-        raise NotImplementedError()
+        action = self.__find_action(self.prev_output)
+        if action:
+            return action(**kwargs)
+        else:
+            raise NotImplementedError()
 
     def _virt_paths(self, kwargs, text_match=True):
         '''
