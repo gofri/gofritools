@@ -3,7 +3,8 @@
 
 from common.stringification import Stringification
 from common import utils, logging
-from L1.lower.results.iresult import IResult, IRecordable
+from L1.lower.results.iresult import IResult, IRecordable, IFileLinable
+from L1.lower.argparse import FileLine
 
 class Record(object):
     def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
@@ -65,6 +66,9 @@ class Record(object):
         assert self.has_elements(
             elements), f'One or more invalid element: {elements}'
 
+    def as_file_line(self):
+        return FileLine(self.path, self.line)
+
     def has_elements(self, elements):
         class NotFound:
             pass
@@ -73,11 +77,13 @@ class Record(object):
                 return False
         return True
 
-class SearchResult(IRecordable):
+class SearchResult(IRecordable, IFileLinable):
     def __init__(self, records=None):
         IRecordable.__init__(self)
+        IFileLinable.__init__(self)
         self._records = records or []
 
+    # IRecordable
     @property
     def records(self):
         return self._records
@@ -95,6 +101,10 @@ class SearchResult(IRecordable):
 
     def set_records(self, records):
         self._records = records
+
+    # IFileLinable
+    def as_file_line_list(self):
+        return [r.as_file_line() for r in self.records]
 
     @property
     def paths(self):

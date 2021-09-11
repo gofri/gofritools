@@ -47,14 +47,6 @@ class FileLine(object):
 
         return fl_list
 
-    @classmethod
-    def L2_combine_pairs(cls, kwargs, records):
-        KEY = 'pairs'
-        pairs = kwargs[KEY] or []
-        pairs += [cls(r.path, r.line) for r in records]
-        kwargs[KEY] = pairs
-        return kwargs
-
     def colored(self):
         file = ui_tools.colored(self.file, key='path')
         if self.line is None:

@@ -26,6 +26,9 @@ class BasicFilter(object):
     def match(self, *args, **kwargs):
         raise NotImplementedError()
 
+    def on_empty_pattern(self, virt_filter):
+        return copy.deepcopy(virt_filter.prev_output)
+
     def post_did_match(self, *args, **kwargs):
         pass
 
@@ -116,7 +119,6 @@ class VirtualFilter(IVirt):
             return self.text[index]
 
     def __prepare_filtering(self):
-        print(f'prev output: {self.prev_output}')
         self.text = self.prev_output.texts
         self.text_colored = list(self.prev_output.texts_colored) # clone for local modification 
         self.paths = self.prev_output.paths
@@ -140,14 +142,15 @@ class VirtualFilter(IVirt):
             self.paths = new_paths
 
     def filter(self, pattern, **ignorable):
-        if pattern == []:
-            return copy.deepcopy(self.prev_output)
-
         res = SearchResult()
 
         self.__prepare_filtering()
         pattern = self.filteree.get_filter_type().default_pattern(pattern)
         filteree = self.filteree.get_relevant_filteree(text=self.text, paths=self.paths)
+
+        # if pattern == []:
+        #    return self.filteree.on_empty_pattern(self)
+
         for i, t in enumerate(filteree):
             any_pattern = False
             for p in pattern:

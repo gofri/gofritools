@@ -1,7 +1,6 @@
 import argparse
 import argcomplete
 from common.argparse import add_sub_parser
-from L1.lower.argparse import FileLine
 from common import utils
 from L1.select import Select
 from common.argparse import general_purpose_parser

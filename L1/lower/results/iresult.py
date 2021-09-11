@@ -1,8 +1,6 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-from common import utils, logging
-
 class IResult(object):
     pass
 
@@ -30,3 +28,7 @@ class IRecordable(object):
         records = [x for i, x in enumerate(records) if i not in to_omit and (
             i in indices or (i < 0 and (records_count+i) in indices))]
         self.set_records(records)
+
+class IFileLinable(object):
+    def as_file_line_list(self):
+        pass
