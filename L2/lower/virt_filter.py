@@ -10,6 +10,7 @@ from L2.lower.ivirt import IVirt
 from common import ui_tools
 from enum import Enum, auto
 import pathlib
+import copy
 
 from L1.find import join_suffix
 
@@ -138,6 +139,9 @@ class VirtualFilter(object):
         self.paths = new_paths
 
     def filter(self, pattern, **ignorable):
+        if pattern == []:
+            return copy.deepcopy(self.prev_output)
+
         res = SearchResult()
 
         self.__prepare_filtering()

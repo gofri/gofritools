@@ -6,7 +6,6 @@ from common.stringification import Stringification
 from common import utils
 from L1.lower.results.search_result import SearchResult
 
-
 class VirtCopy(IVirt):
     def __init__(self, *args, **kwargs):
         IVirt.__init__(self, *args, **kwargs, _underlying_prog_t=Copy, stackable=False, dirtying=False)
