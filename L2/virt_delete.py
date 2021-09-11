@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # encoding: utf-8
 from L1.delete import Delete
-from L2.lower.ivirt import VirtFileLine
+from L2.lower.virt_file_line import VirtFileLine
 
 class VirtDelete(VirtFileLine):
     def __init__(self, *args, **kwargs):
