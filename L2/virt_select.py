@@ -2,7 +2,7 @@
 # encoding: utf-8
 from L2.lower.ivirt import IVirt
 from L1.select import Select
-from L1.lower.results.search_result import SearchResult
+from L1.lower.results.iresult import IRecordable
 
 class VirtSelect(IVirt):
     def __init__(self, *args, **kwargs):
@@ -10,7 +10,7 @@ class VirtSelect(IVirt):
 
     @classmethod
     def _action_map(cls, self):
-        return { SearchResult: self and self.__handle_result }
+        return { IRecordable: self and self.__handle_result }
 
     @classmethod
     def underlying_prog(cls):

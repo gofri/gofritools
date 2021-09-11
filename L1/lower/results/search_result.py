@@ -3,7 +3,7 @@
 
 from common.stringification import Stringification
 from common import utils, logging
-from L1.lower.results.iresult import IResult
+from L1.lower.results.iresult import IResult, IRecordable
 
 class Record(object):
     def __init__(self, path=None, line=None, text=None, text_colored=None, caller=None, pre_ctx=None, post_ctx=None, is_decl=False):
@@ -73,12 +73,28 @@ class Record(object):
                 return False
         return True
 
-class SearchResult(IResult):
+class SearchResult(IRecordable):
     def __init__(self, records=None):
+        IRecordable.__init__(self)
         self._records = records or []
+
     @property
     def records(self):
         return self._records
+
+    @property
+    def records_count(self):
+        return len(self._records)
+
+    def add_record(self, *args, **kwargs):
+        r = Record(*args, **kwargs)
+        if (path := utils.should_ignore_record(r)):
+            logging.verbose_print(f'Ignoring record with path: {path}')
+            return
+        self.records.append(r)
+
+    def set_records(self, records):
+        self._records = records
 
     @property
     def paths(self):
@@ -96,28 +112,10 @@ class SearchResult(IResult):
     def texts_colored(self):
         return [r.text_colored for r in self._records]
 
-    @property
-    def records_count(self):
-        return len(self._records)
-
-    def add_record(self, *args, **kwargs):
-        r = Record(*args, **kwargs)
-        if (path := utils.should_ignore_record(r)):
-            logging.verbose_print(f'Ignoring record with path: {path}')
-            return
-        self.records.append(r)
-
     @classmethod
     def from_dicts(cls, l):
         records = [Record.from_dict(d) for d in l]
         return SearchResult(records)
-
-    def keep_indices(self, indices, to_omit=None):
-        to_omit = to_omit or ()
-        if not indices:
-            indices = range(0, len(self._records))
-        self._records = [x for i, x in enumerate(self._records) if i not in to_omit and (
-            i in indices or (i < 0 and (len(self._records)+i) in indices))]
 
     def trim(self):
         for r in self._records:
