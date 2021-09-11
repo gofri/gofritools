@@ -7,9 +7,10 @@ from L1.lower.results.search_result import SearchResult
 from L1.lower.results.iresult import IResult
 
 
-class VirtFind(IVirt):
+class VirtFind(VirtualFilter):
     def __init__(self, *args, **kwargs):
-        IVirt.__init__(self, *args, **kwargs, _underlying_prog_t=Find, stackable=True, dirtying=False)
+        VirtualFilter.__init__(self, Filteree.PATH, *args, **kwargs, stackable=True, dirtying=False)
 
-    def _run_virt(self, **kwargs):
-        return VirtualFilter.virt_filter(self, Filteree.PATH, **kwargs)
+    @classmethod
+    def underlying_prog(cls):
+        return Find

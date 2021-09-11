@@ -6,11 +6,15 @@ from L1.lower.results.search_result import SearchResult
 
 class VirtSelect(IVirt):
     def __init__(self, *args, **kwargs):
-        IVirt.__init__(self, *args, **kwargs, _underlying_prog_t=Select, stackable=True, dirtying=False)
+        IVirt.__init__(self, *args, **kwargs, stackable=True, dirtying=False)
 
-    @property
-    def action_map(self):
-        return { SearchResult: self.__handle_result }
+    @classmethod
+    def _action_map(cls, self):
+        return { SearchResult: self and self.__handle_result }
+
+    @classmethod
+    def underlying_prog(cls):
+        return Select
 
     def __handle_result(self, **kwargs):
         kwargs['search_res'] = self.prev_output

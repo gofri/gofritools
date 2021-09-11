@@ -7,6 +7,7 @@ from L1.select import Select
 from common.argparse import general_purpose_parser
 from common.ui_tools import colored
 from L1.upper.program_factory import ProgramFactory
+from L2.upper.virt_factory import VirtFactory
 import shlex
 import readline
 import argcomplete
@@ -38,11 +39,12 @@ def mode_parser(parser):
 
     return parsers
 
-def add_commands_parser(parser, interactive, virt, required):
+def add_commands_parser(parser, interactive, virt, required, input_data):
     # TODO move this argparsing to virt layer 
     subparsers = parser.add_subparsers(dest='command', required=virt)
 
-    ProgramFactory.arg_parser(subparsers)
+    VirtFactory.arg_parser(input_data, subparsers)
+    # ProgramFactory.arg_parser(subparsers)
 
     # INTERACTIVE-DEPENDENT
     if interactive:
@@ -130,7 +132,7 @@ class FilteredFinder(argcomplete.CompletionFinder):
         return res
 
 
-def make_parser(interactive=False, virt=False):
+def make_parser(interactive=False, virt=False, input_data=None):
     # Setup argument parser
     general_purpose = general_purpose_parser()
     parser = argparse.ArgumentParser(parents=[general_purpose])
@@ -142,7 +144,7 @@ def make_parser(interactive=False, virt=False):
         mode_parsers = mode_parser(parser)
         
     for name, p in mode_parsers.items():
-        add_commands_parser(p, interactive=interactive, virt=virt, required=(name != 'interactive'))
+        add_commands_parser(p, interactive=interactive, virt=virt, required=(name != 'interactive'), input_data=input_data)
 
     # Autocomplete
     argcomplete.autocomplete(parser)

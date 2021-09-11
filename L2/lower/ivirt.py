@@ -9,16 +9,22 @@ from common.utils import SimpleCache
 import copy
 
 class IVirt(IProgram):
-    def __init__(self, ishell, prev_output, _underlying_prog_t, stackable=True, dirtying=True):
+    def __init__(self, ishell, prev_output, stackable=True, dirtying=True):
         ''' underlying_prog_t by implementor
             ghost = do not appear in stack
             '''
 
         IProgram.__init__(self, ishell)
         self.prev_output = prev_output
-        self._underlying_prog = _underlying_prog_t(ishell)
+        self._underlying_prog = self.underlying_prog()(ishell)
         self.stackable = stackable
         self.dirtying = dirtying
+
+    @classmethod
+    def arg_parser(cls, input_data, *args, **kwargs):
+        input_data = input_data or IResult()
+        if cls.can_handle(input_data):
+            return cls.underlying_prog().arg_parser(*args, **kwargs)
 
     def _run_virt_prog(self):
         retval = self._run_virt(**self.kwargs)
@@ -39,20 +45,31 @@ class IVirt(IProgram):
         self.run(**self.kwargs)
         return self.output
 
-    def __find_action(self, input_data):
-        for input_type, action in self.action_map.items():
+    @classmethod
+    def __find_action_key(cls, input_data):
+        for input_type in cls.get_action_keys():
             if isinstance(input_data, input_type):
-                return self.action_map[input_type]
+                return input_type
         return None
 
-    def can_handle(self, input_data):
-        return self.__find_action(input_data) is not None
+    def __find_action(self, input_data):
+        key = self.__find_action_key(input_data)
+        return key and self.action_map[key]
 
+    @classmethod
+    def can_handle(cls, input_data):
+        return cls.__find_action_key(input_data) is not None
+
+    ''' Hack to make the keys class-level, while having the action self-self.
+        see _action_map for each subclass. ''' 
     @property
-    @abstractmethod
     def action_map(self):
-        pass
-
+        return self._action_map(self)
+    @classmethod
+    def get_action_keys(cls):
+        # sort by reverse-mro: loop for more-specific definition first
+        return sorted(cls._action_map(None).keys(), key=lambda cls:len(cls.mro()), reverse=True)
+        
     def _run_virt(self, **kwargs):
         action = self.__find_action(self.prev_output)
         if action:

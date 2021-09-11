@@ -104,13 +104,9 @@ class Filteree(Enum):
     
 ###
 
-class VirtualFilter(object):
-    def __init__(self, prev_output, filteree: Filteree):
-        self.prev_output = prev_output
-        self.text = self.prev_output.texts
-        self.text_colored = list(self.prev_output.texts_colored) # clone for local modification 
-        self.paths = self.prev_output.paths
-        self.lines = self.prev_output.lines
+class VirtualFilter(IVirt):
+    def __init__(self, filteree: Filteree, *args, **kwargs):
+        IVirt.__init__(self, *args, **kwargs)
         self.filteree = filteree
 
     def text_colored_or_text(self, index):
@@ -120,10 +116,16 @@ class VirtualFilter(object):
             return self.text[index]
 
     def __prepare_filtering(self):
-        new_text = []
-        new_lines = []
-        new_paths = []
+        print(f'prev output: {self.prev_output}')
+        self.text = self.prev_output.texts
+        self.text_colored = list(self.prev_output.texts_colored) # clone for local modification 
+        self.paths = self.prev_output.paths
+        self.lines = self.prev_output.lines
+
         if self.filteree == Filteree.TEXT and not any(self.text):
+            new_text = []
+            new_lines = []
+            new_paths = []
             assert not any(self.lines), 'lines without text?'
             for i, path in enumerate(self.paths):
                 with open(path) as f:
@@ -131,12 +133,11 @@ class VirtualFilter(object):
                         new_paths.append(path)
                         new_text.append(l)
                         new_lines.append(i+1)
-
-        new_colored = [''] * len(new_text)
-        self.text = new_text
-        self.lines = new_lines
-        self.text_colored = new_colored
-        self.paths = new_paths
+            new_colored = [''] * len(new_text)
+            self.text = new_text
+            self.lines = new_lines
+            self.text_colored = new_colored
+            self.paths = new_paths
 
     def filter(self, pattern, **ignorable):
         if pattern == []:
@@ -160,15 +161,8 @@ class VirtualFilter(object):
         return res 
 
     @classmethod
-    def virt_filter(cls, virt: IVirt, filteree: Filteree, **kwargs):
-        options = {
-            SearchResult: lambda: cls(virt.prev_output, filteree).filter(**kwargs),
-            IResult: lambda: virt._underlying_prog.run(**kwargs),
+    def _action_map(cls, self):
+        return {
+            SearchResult: self and self.filter,
+            IResult: self and self._underlying_prog.run
         }
-
-        for option, action in options.items():
-            if isinstance(virt.prev_output, option):
-                return action()
-
-        raise NotImplementedError()
-

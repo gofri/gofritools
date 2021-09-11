@@ -33,6 +33,7 @@ class Find(IProgram):
             pattern = [fr'\b{p}\b' for p in pattern]
 
         # special treat wildness to handle paths
+        # TODO wild==1 (search dirs too) is broken
         pre_crosser = '.*' if wildness>=1 else '[^/]*' # allow for cross-dir search
         post_crosser = '[^\./]*' # XXX: for ease of impl, "bug": act as if non-basename should not have suffix either
         fake_wildness = max(1, wildness) # set wildness to >= 1 to force wrapping with pre/post (search rather than match)

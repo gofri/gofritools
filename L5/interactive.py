@@ -62,7 +62,7 @@ class InteractiveMode(IOpMode):
                         print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
 
                 # Read next cmd
-                parser = gofriparse.make_parser(interactive=True, virt=True)
+                parser = gofriparse.make_parser(interactive=True, virt=True, input_data=cmd_res)
 
                 try:
                     cmdline = gofriparse.read_cmdline(">>> ")

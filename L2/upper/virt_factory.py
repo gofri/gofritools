@@ -14,7 +14,6 @@ from L1.upper.program_factory import ProgramFactory
 from L2.virt_element import VirtElement
 from L2.virt_difftool import VirtDifftool
 
-
 class VirtFactory(ProgramFactory):
     VIRT_PROGRAMS = {
         'grep': VirtGrep,
@@ -28,7 +27,7 @@ class VirtFactory(ProgramFactory):
         'trim': VirtTrim,
         'element': VirtElement,
         'difftool': VirtDifftool,
-        'gql': VirtGql,
+        # 'gql': VirtGql, # TODO fix gql to match new scheme
     }
 
     def __init__(self, prev_output, shell_name=None):
@@ -43,5 +42,11 @@ class VirtFactory(ProgramFactory):
             return ProgramFactory.create(self, command)
 
     @classmethod
+    def arg_parser(cls, input_data, parent):
+        for name, prog in cls.VIRT_PROGRAMS.items():
+            prog.arg_parser(input_data, parent)
+
+    @classmethod
     def get_virt_prog_type(cls, name):
         return cls.VIRT_PROGRAMS[name]
+
