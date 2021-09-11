@@ -35,11 +35,8 @@ class VirtFactory(ProgramFactory):
         self.prev_output = prev_output
 
     def create(self, command):
-        if self.prev_output:  # and not self.virt_set: # Revert to regular program factory if no input
-            virt_prog_type = self.get_virt_prog_type(command)
-            return virt_prog_type(self.shell, self.prev_output)
-        else:
-            return ProgramFactory.create(self, command)
+        virt_prog_type = self.get_virt_prog_type(command)
+        return virt_prog_type(self.shell, self.prev_output)
 
     @classmethod
     def arg_parser(cls, input_data, parent):

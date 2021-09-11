@@ -5,7 +5,6 @@ from common import utils
 from L1.select import Select
 from common.argparse import general_purpose_parser
 from common.ui_tools import colored
-from L1.upper.program_factory import ProgramFactory
 from L2.upper.virt_factory import VirtFactory
 import shlex
 import readline
@@ -39,11 +38,8 @@ def mode_parser(parser):
     return parsers
 
 def add_commands_parser(parser, interactive, virt, required, input_data):
-    # TODO move this argparsing to virt layer 
     subparsers = parser.add_subparsers(dest='command', required=virt)
-
     VirtFactory.arg_parser(input_data, subparsers)
-    # ProgramFactory.arg_parser(subparsers)
 
     # INTERACTIVE-DEPENDENT
     if interactive:
