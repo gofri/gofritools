@@ -16,8 +16,13 @@ def common_pattern_parser_partial():
 def common_pattern_parser():
     ''' Common flags for cmds with a pattern '''
     common_pattern = common_pattern_parser_partial()
+    def docker_path(s):
+        if s.startswith('/'):
+           s = '/mnt/root' + s 
+        return s
+
     common_pattern.add_argument(
-        '-f', '--files', help='Limit the operation to specific files / directories', type=str, nargs='+', default=[])
+        '-f', '--files', help='Limit the operation to specific files / directories', type=docker_path, nargs='+', default=[])
     common_pattern.add_argument(
         '-v', '--invert', action='store_true', help='invert match (like grep -v)')
     common_pattern.add_argument(

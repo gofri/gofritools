@@ -86,6 +86,9 @@ class Grep(IProgram):
         return res
 
     def __get_util(self, git):
+        # TODO should allow for non-git searches
+        #      context is obviously an issue here,
+        #      but re-writing grep should allow for such a thing.
         if git: 
             # Allow fallback
             return 'git -c grep.fallbackToNoIndex=true grep'
