@@ -2,6 +2,7 @@ import argparse
 from common import ui_tools
 from common import utils
 from L1.lower.fileline import FileLine
+from common.docker import Docker
 
 def common_pattern_parser_partial():
     common_pattern = argparse.ArgumentParser(add_help=False)
@@ -16,13 +17,8 @@ def common_pattern_parser_partial():
 def common_pattern_parser():
     ''' Common flags for cmds with a pattern '''
     common_pattern = common_pattern_parser_partial()
-    def docker_path(s):
-        if s.startswith('/'):
-           s = '/mnt/root' + s 
-        return s
-
     common_pattern.add_argument(
-        '-f', '--files', help='Limit the operation to specific files / directories', type=docker_path, nargs='+', default=[])
+        '-f', '--files', help='Limit the operation to specific files / directories', type=Docker().outside_to_inside, nargs='+', default=[])
     common_pattern.add_argument(
         '-v', '--invert', action='store_true', help='invert match (like grep -v)')
     common_pattern.add_argument(

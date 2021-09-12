@@ -90,8 +90,10 @@ main() {
     # Installation
     UTIL="${INSTALL_DIR}/${UTIL_NAME}"
     __RUN_ARGS=''
-    start_script="${engine} run -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --detach --privileged -v /:/mnt/root --workdir /mnt/root\$(pwd) --name ${CONTAINER_NAME} ${IMAGE_NAME} bash"
+    start_script="${engine} run --hostname gofritools -it -e DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --detach --privileged -v /:/mnt/root --workdir /mnt/root\$(pwd) --name ${CONTAINER_NAME} ${IMAGE_NAME} bash"
     resume_script="${engine} start ${CONTAINER_NAME}"
+    stop_script="${engine} stop ${CONTAINER_NAME}"
+    kill_script="${engine} rm ${CONTAINER_NAME}"
     __exec_script="if test -p /dev/stdin; then mode='-t'; else mode='-it'; fi; ${engine} exec \${mode} --workdir /mnt/root\$(pwd) ${CONTAINER_NAME}"
     exec_script="${__exec_script} gofritools \"\$@\""
     chmod +x "${UTIL}"
@@ -104,11 +106,13 @@ main() {
         echo "${UTIL_NAME} i g \"\$@\"" > gg
         echo "${UTIL_NAME} i f \"\$@\"" > ff
         echo "$start_script 2>/dev/null || $resume_script" > gof-start
+        echo "$stop_script" > gof-stop
+        echo "$kill_script" > gof-kill
         echo "$__exec_script bash -c '(cd /gofritools && git pull)'" > gof-update
         echo "$__exec_script bash -c '(cd /gofritools && git fetch && git reset --hard origin/master)'" > gof-force-update
         echo "$__exec_script bash" > gof-enter
 
-        chmod +x gof gofi gg ff gof-start gof-update gof-force-update gof-enter
+        chmod +x gof gofi gg ff gof-start gof-stop gof-kill gof-update gof-force-update gof-enter
     )
 
     # Kick-off

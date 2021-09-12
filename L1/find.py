@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # encoding: utf-8
 
-from common import utils, ui_tools, logging
+from common import utils, ui_tools, logging, docker
 from L1.lower.iprogram import IProgram
 from L1.lower.results.search_result import SearchResult
 from L1.lower.argparse import common_pattern_parser
@@ -60,6 +60,7 @@ class Find(IProgram):
         ''' TODO integrate into search res record creation '''
         matches = self.__remove_leading_cur_dir(matches)
         matches = utils.unify_paths(matches)
+        matches = self.__fix_docker_paths(matches)
 
         res = SearchResult.from_dicts([{'path':match} for match in matches])
 
@@ -74,6 +75,10 @@ class Find(IProgram):
 
     def __remove_leading_cur_dir(self, paths):
         return [path[2:] if path.startswith('./') else path for path in paths]
+
+    def __fix_docker_paths(self, paths):
+        fixer = docker.Docker().inside_to_outside
+        return [fixer(p) for p in paths]
 
     @classmethod
     def get_expressions(cls, regex, pattern, suffix, invert, invert_suffix, wildness, whole_word):
