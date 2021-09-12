@@ -21,6 +21,6 @@ class Docker(object):
         return path
 
     def inside_to_outside(self, path):
-        if self.in_docker and path.startswith(MOUNT_DIR):
-           path = path[self.MOUNT_DIR:]
+        if self.in_docker and path.startswith(self.MOUNT_DIR):
+            path = path[len(self.MOUNT_DIR):]
         return path
