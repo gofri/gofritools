@@ -124,7 +124,7 @@ class Find(IProgram):
             new_suffix = [ [regex, f'^.*\.{s}$'] for s in suffix ]
             new_pattern = [ [regex, f'{ANY_DIR}{WILDCHAR_IN_DIR}{p}{ANY_EXT}'] for p in pattern ]
         else:
-            new_suffix = [ ['-not', regex, '.*/{ANY_EXT}'] ]
+            new_suffix = [ ['-not', regex, f'.*/{ANY_EXT}'] ]
             new_pattern = [ [regex, f'{ANY_DIR}{WILDCHAR_IN_DIR}{p}[^/\.]*$'] for p in pattern ]
 
 
