@@ -111,8 +111,9 @@ main() {
         echo "$__exec_script bash -c '(cd /gofritools && git pull)'" > gof-update
         echo "$__exec_script bash -c '(cd /gofritools && git fetch && git reset --hard origin/master)'" > gof-force-update
         echo "$__exec_script bash" > gof-enter
+        echo "args=\"\$@\"; $__exec_script bash -c \"\$args\"" > gof-exec
 
-        chmod +x gof gofi gg ff gof-start gof-stop gof-kill gof-update gof-force-update gof-enter
+        chmod +x gof gofi gg ff gof-start gof-stop gof-kill gof-update gof-force-update gof-enter gof-exec
     )
 
     # Kick-off
