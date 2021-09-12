@@ -3,7 +3,7 @@
 
 import traceback
 import sys
-from common import ui_tools
+from common import ui_tools, docker
 
 VERBOSE_NONE = 0
 VERBOSE_1 = 1
@@ -25,10 +25,11 @@ def verbose_print(data, min_verbosity=VERBOSE_1):
 
 
 def verbose_print_cmd(cmd, label=''):
-    oneline = ' '.join((f"'{x}'" if i>0 else x for i, x in enumerate(cmd)))
+    d = docker.Docker()
+    friendly_cmd = [d.inside_to_outside(x) for x in cmd]
+    oneline = ' '.join((f"'{x}'" if i>0 else x for i, x in enumerate(friendly_cmd)))
     oneline = ui_tools.colored(oneline, bg='lightblue_ex')
     verbose_print(f'{label} Executing: {cmd} == \n{oneline}', VERBOSE_2)
-
 
 def print_to_stderr(data, color='red', verbose_prefix=True):
     print(ui_tools.colored('VERBOSE | ' + str(data), color), file=sys.stderr)
