@@ -33,14 +33,9 @@ def get_wild_version(pattern, wildness, pre_any='.*', post_any='.*'):
     def surround_any(x): return pre_any + x + post_any
     def replace_separators(x): return x.replace(
         '-', '_').replace(' ', '_').replace('_', '[ _-]+')
-
-    # XXX: do not make wildness=0 add surround_any:
-    #      although same result, text coloring would be different
     if wildness == 0:
         return pattern
-    elif wildness == 1:
-        return surround_any(pattern)
-    elif wildness >= 2:
+    elif wildness >= 1:
         return surround_any(replace_separators(pattern))
 
 class MultipleFiles(object):

@@ -59,6 +59,7 @@ class InteractiveMode(IOpMode):
                     if not (self.__verbosity or info):
                         ui_tools.clear_screen()
                     if not info:
+                        # TODO bug when stepb: IResult does not have humanize
                         print(f'Result:\n===\n{cmd_res.humanize()}\n===\n')
 
                 # Read next cmd

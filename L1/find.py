@@ -5,6 +5,7 @@ from common import utils, ui_tools, logging
 from L1.lower.iprogram import IProgram
 from L1.lower.results.search_result import SearchResult
 from L1.lower.argparse import common_pattern_parser
+import itertools
 
 
 def join_suffix(suffix):
@@ -14,64 +15,49 @@ def join_suffix(suffix):
         return '$'
 
 class Find(IProgram):
+    '''
+    Rules:
+    A match is a combination (AND) of two sub-comparisons:
+    pattern.search(basename) act like grep on base name.
+    suffix.match(extension) act like grep-match on extension=suffix.
+
+    wildness: # reimplement wildness...
+    wild=1: match if any(apply pattern to each path directive i.e. dirs/basename).
+    wild=2: loose word-separators treatment.
+
+    invertion:
+    --invert: invert pattern search (no effect on suffix)
+    --invert-suffix: invert suffix search (no effect on pattern)
+    One can use whatever combination one would like.
+
+    whole_word:
+    Apply whole-word to the pattern.
+    '''
     SUPRESS_PERM_ERRORS = ['-not', '-readable', '-prune', '-o']
+    REGEX_TYPE = ['-regextype', 'egrep']
+    PRINT_ACTION = ['-print']
+    REGEX_START = '^(\./)?'
     def _run_prog(self, pattern, wildness=0, suffix=None, case_sensitive=True, extra_flags=None, files=None, gof_ignore=None, whole_word=None, invert=False, invert_suffix=False):
-        pattern = pattern or ['[^\.]*']
-        # TODO more generally, find should behave like grep, by means that:
-        #   * search, rather than match (see note below).
-        #   * search is done on the basename, excluding the suffix.
-        #   * a first level of wild-ening is searching for any directive of the path
-        #     TIP: find -regex (acts on whole path) with '/pattern' should work for searching any-directive of the path
-        #     given that pattern is alrady adjusted to act as search rather match
-        #   * a whole-word is, by nature, the entire base name.
-        #     "by nature", rather than by definition: if the directive is e.g. wierd-file+name.txt,
-        #     then whole word will not work properly here, since e.g. 'wierd' is a valid whole-word here.
-        #     This is not a problem when find always searches for filename/dir rather than entire path
-        #     
-        #   * THE REAL FIND (this function) should be heavily adjusted accordingly. 
-        if whole_word:
-            pattern = [fr'\b{p}\b' for p in pattern]
-
-        # special treat wildness to handle paths
-        # TODO wild==1 (search dirs too) is broken
-        pre_crosser = '.*' if wildness>=1 else '[^/]*' # allow for cross-dir search
-        post_crosser = '[^\./]*' # XXX: for ease of impl, "bug": act as if non-basename should not have suffix either
-        fake_wildness = max(1, wildness) # set wildness to >= 1 to force wrapping with pre/post (search rather than match)
-        pattern = [utils.get_wild_version(p, fake_wildness, pre_any=pre_crosser, post_any=post_crosser) for p in pattern]
-        pattern = [self.__with_regex_prefix(p) for p in pattern]
-
-        # add suffix
-        suffix = join_suffix(suffix)
-        pattern = [p + suffix for p in pattern]
-
-        regextype = ['-regextype', 'egrep']
-        files_to_search = self.__get_files_to_search(files)
-        # https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find/25234419#comment48051875_25234419
-        print_action = ['-print']
-
         case_fix = '' if case_sensitive else 'i'
         regex = f'-{case_fix}regex'
-        invert = '!' if invert else ''
+        invert = ['-not'] if invert else []
+        invert_suffix = ['-not'] if invert_suffix else []
+        files_to_search = self.__get_files_to_search(files)
 
-        # find's -or options take only the first option -- build it with regex instead.
-        pattern = [invert, regex, '|'.join(f'({p})' for p in pattern)]
-
-        # make sure to filter out by suffix even on invertion
-        if invert:
-            pattern += ['-and', regex, '.*'+suffix]
+        matches = self.get_expressions(regex, pattern, suffix, invert, invert_suffix, whole_word, wildness)
 
         cmd = ['find'] + \
             files_to_search + \
             self.SUPRESS_PERM_ERRORS + \
-            regextype + \
+            self.REGEX_TYPE + \
             (extra_flags or []) + \
-            pattern + \
-            print_action
+            matches + \
+            self.PRINT_ACTION
 
         res = self.ishell.run_cmd(cmd, must_work=True)
         matches = res['stdout'].splitlines()
-        ''' TODO integrate into search res record creation '''
 
+        ''' TODO integrate into search res record creation '''
         matches = self.__remove_leading_cur_dir(matches)
         matches = utils.unify_paths(matches)
 
@@ -80,6 +66,7 @@ class Find(IProgram):
         return res
 
     def __get_files_to_search(self, files):
+        # XXX: https://stackoverflow.com/questions/762348/how-can-i-exclude-all-permission-denied-messages-from-find/25234419#comment48051875_25234419
         return files if files else ['.']
 
     def __with_regex_prefix(self, pattern):
@@ -88,6 +75,69 @@ class Find(IProgram):
     def __remove_leading_cur_dir(self, paths):
         return [path[2:] if path.startswith('./') else path for path in paths]
 
+    @classmethod
+    def get_expressions(cls, regex, pattern, suffix, invert, invert_suffix, wildness, whole_word):
+        '''
+            Algorithm rules:
+            pattern dir:
+                match '{ANY_DIR}[^/*]{pattern}[^/*]/.*$'
+
+            suffix:
+                match '^.*\.{suffix}$'
+
+                pattern basename:
+                   match '{ANY_DIR}[^/*]{pattern}{ANY_EXT}'
+
+            no-suffix:
+                not match '.*/{ANY_EXT}'
+
+                pattern basename:
+                   match '{ANY_DIR}[^/*]{pattern}[^/\.]*$'
+
+            always should do:
+                pat = pat_basename
+                if wild:
+                    pat = pat_basename | pat_dir
+                find -regex pat and -regex suffix
+
+        '''
+        WILDCHAR_IN_DIR = '[^/]*' # assume: after '/'
+        ANY_EXT = f'{WILDCHAR_IN_DIR}\.{WILDCHAR_IN_DIR}$' # assume: after /
+        ANY_DIR = '^(.*/)?' # assume: leading
+
+        if not pattern:
+            pattern = [WILDCHAR_IN_DIR] # look for anything by default
+
+        # whole-word
+        if whole_word:
+            pattern = [fr'\b{p}\b' for p in pattern]
+
+        # translate each pattern/suffix to its matching list-of-args
+        new_suffix = []
+        new_pattern = []
+        if suffix:
+            new_suffix = [ [regex, f'^.*\.{s}$'] for s in suffix ]
+            new_pattern = [ [regex, f'{ANY_DIR}{WILDCHAR_IN_DIR}{p}{ANY_EXT}'] for p in pattern ]
+        else:
+            new_suffix = [ ['-not', regex, '.*/{ANY_EXT}'] for s in suffix ]
+            new_pattern = [ [regex, f'{ANY_DIR}{WILDCHAR_IN_DIR}{p}[^/\.]*$'] for p in pattern ]
+
+
+        if wildness >= 1: # search all dirs
+            pre = f'{ANY_DIR}{WILDCHAR_IN_DIR}'
+            post = f'{WILDCHAR_IN_DIR}/.*$'
+            new_pattern = [ ['('] + p + ['-or', regex, f'{pre}{p}{post}', ')'] \
+                            for p in new_pattern ]
+
+        # translate to a concrete line that combines all relations:
+        pattern = list(itertools.chain(*new_pattern))
+        join_by_or = lambda i,s: s + ([] if i == len(new_suffix)-1 else ['-or'])
+        new_suffix = [join_by_or(i,s) for i, s in enumerate(new_suffix)]
+        suffix = ['('] + list(itertools.chain(*new_suffix)) + [')']
+        AND = '-a' # -and is not POSIX compliant; two-consecutive expressions imply -and.
+        matches = ['('] + invert + pattern + [AND] + invert_suffix + suffix + [')']
+
+        return matches
 
     @classmethod
     def arg_parser(cls, parent):
