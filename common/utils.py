@@ -29,14 +29,13 @@ class SimpleCache(object):
             self.data = self.action(*self.args, **self.kwargs)
         return self.data
 
-def get_wild_version(pattern, wildness, pre_any='.*', post_any='.*'):
-    def surround_any(x): return pre_any + x + post_any
+def get_wild_version(pattern, wildness):
     def replace_separators(x): return x.replace(
         '-', '_').replace(' ', '_').replace('_', '[ _-]+')
     if wildness == 0:
         return pattern
     elif wildness >= 1:
-        return surround_any(replace_separators(pattern))
+        return replace_separators(pattern)
 
 class MultipleFiles(object):
     @staticmethod
