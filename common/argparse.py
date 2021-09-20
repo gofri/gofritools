@@ -34,6 +34,7 @@ def general_purpose_parser():
         '--gof-ignore', help='Provide file which contains string literals that must not appear in any path in result', type=argparse.FileType('r'), default=None)
     general_purpose.add_argument('-o', '--output-type', help='Data format for the output',
                                  type=str, choices=utils.OutputTypes.options(), default=None)
+    general_purpose.add_argument('--max-line-size', type=int, default=500, help='the maximal size to present for a line of text')
 
     return general_purpose 
 

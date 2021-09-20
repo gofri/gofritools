@@ -173,14 +173,14 @@ class SearchResult(IRecordable, IFileLinable, IOutputable):
             r for r in self._records if r.get(element) in value_list]
 
     # IOutputable
-    def jsonize(self):
-        return utils.jsonize(self._records)
+    def jsonize(self, **kwargs):
+        return utils.jsonize(self._records, **kwargs)
 
-    def humanize(self):
-        return Stringification.stringify_output(self._records)
+    def humanize(self, **kwargs):
+        return Stringification.stringify_output(self._records, **kwargs)
 
-    def raw_text(self):
-        return Stringification.raw_text(self._records)
+    def raw_text(self, **kwargs):
+        return Stringification.raw_text(self._records, **kwargs)
 
     def picklize(self):
         return utils.picklize(self)

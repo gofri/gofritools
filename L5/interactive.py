@@ -10,6 +10,7 @@ class InteractiveMode(IOpMode):
         self.parser = parser
         self.verbosity = args.verbosity # base verbosity for all cmds
         self.args.verbosity = 0 # Avoid double-counting of verbosity of first cmd
+        self.max_line_size = args.max_line_size # TODO must move to visualization with verbosity, current behavior just not maintainable and is less useful
 
     @property
     def __verbosity(self):
@@ -60,7 +61,7 @@ class InteractiveMode(IOpMode):
                         ui_tools.clear_screen()
                     if not info:
                         try:
-                            message = cmd_res.humanize()
+                            message = cmd_res.humanize(max_line_size=self.max_line_size)
                         except AttributeError:
                             message = str(cmd_res)
                         print(f'Result:\n===\n{message}\n===\n')

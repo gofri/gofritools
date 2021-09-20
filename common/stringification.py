@@ -10,9 +10,9 @@ from builtins import classmethod
 
 class Stringification(object):
     @classmethod
-    def stringify_output(cls, output, colored=True):
+    def stringify_output(cls, output, colored=True, **kwargs):
         ''' for multiple records '''
-        return ui_tools.get_as_incrementing_list(output, cls.stringify_record, is_colored=colored)
+        return ui_tools.get_as_incrementing_list(output, cls.stringify_record, is_colored=colored, **kwargs)
 
     @classmethod
     def stringify_record(cls, i, r, colored=True, **kwargs):
@@ -67,6 +67,10 @@ class Stringification(object):
             context = joined + '\n'
 
 
+        max_size = kwargs.get('max_line_size')
+        if len(text) > max_size:
+            warning = ui_tools.colored(f'<Warning [from gofritools]: the text above is truncated from {len(text)} to {max_size} chars>', color='red')
+            text = text[:max_size] + '\n' + warning
         return text, context, break_before
 
     @classmethod
@@ -96,4 +100,4 @@ class Stringification(object):
     def stringify_by_args(cls, data, output_type, **kwargs):
         choice = utils.OutputTypes.make_choice(
             output_type, r=data.raw_text, h=data.humanize, j=data.jsonize)
-        return choice()
+        return choice(**kwargs)
