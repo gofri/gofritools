@@ -227,4 +227,7 @@ def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
 
 def safe_splitlines(text):
     pure_linebreak = re.compile(r'\u000a')
-    return [l for l in pure_linebreak.split(text) if l]
+    res = pure_linebreak.split(text)
+    if res and not res[-1]:
+        res = res[:-1]
+    return res
