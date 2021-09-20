@@ -143,7 +143,7 @@ def __real_get_ignore_list(ignore_file=None):
         with open(ignore_file, 'r') as f:
             return f.read().splitlines()
     except Exception as e:
-        return ''
+        return []
 
 g_ignore_list = SimpleCache(__real_get_ignore_list)
 
@@ -227,4 +227,4 @@ def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
 
 def safe_splitlines(text):
     pure_linebreak = re.compile(r'\u000a')
-    return pure_linebreak.split(text)
+    return [l for l in pure_linebreak.split(text) if l]

@@ -24,6 +24,7 @@ def common_pattern_parser():
     common_pattern.add_argument(
         '-w', '--whole-word', help='grep for whole word', action='store_true', default=False)
 
+    common_pattern.add_argument('--exclude-files', nargs='*', type=str, default=['.*pdf$', '^(\./)?vendor/.*'])
     return common_pattern
 
 def common_file_line_parser():

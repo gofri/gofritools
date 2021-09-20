@@ -115,8 +115,6 @@ class Grep(IProgram):
             '--text', help='Grep text rather than files - input from this flag', type=str, default=None)
         inputs.add_argument('-p', '--context', help='Grab context for the result (works for c files)', action='store_true', dest='context', default=True)
         inputs.add_argument('-P', '--no-context', help='DO NOT grab context for the result', action='store_false', dest='context')
-        grep_parser.add_argument('--exclude-files', nargs='*', type=str,
-                                 help='file patterns to exclude', default=['*.pdf'])  # Breaks encoding
 
 class InlineSeparator(Enum):
     CALLER = '='
@@ -154,7 +152,7 @@ class Parsing(object):
 
     def __split_line(self, line):
         indices = {s:index for s in InlineSeparator if (index:=line.find(s.value)) != -1}
-        assert indices, 'must be at least one of them'
+        assert indices, f'must be at least one separator @ "{line}"'
         sep = min(indices, key=(lambda k:indices[k]))
         
         # sep, line, text
