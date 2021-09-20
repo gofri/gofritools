@@ -224,3 +224,7 @@ def compile_re(pattern, case_sensitive=False, wildness=0, whole_word=False):
     pattern = get_wild_version(pattern, wildness)
     flags = 0 if case_sensitive else re.IGNORECASE
     return re.compile(pattern, flags)
+
+def safe_splitlines(text):
+    pure_linebreak = re.compile(r'\u000a')
+    return pure_linebreak.split(text)

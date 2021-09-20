@@ -55,7 +55,7 @@ class Find(IProgram):
             self.PRINT_ACTION
 
         res = self.ishell.run_cmd(cmd, must_work=True)
-        matches = res['stdout'].splitlines()
+        matches = utils.safe_splitlines(res['stdout'])
 
         ''' TODO integrate into search res record creation '''
         matches = self.__remove_leading_cur_dir(matches)

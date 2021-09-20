@@ -131,7 +131,7 @@ class VirtualFilter(IVirt):
             assert not any(self.lines), 'lines without text?'
             for i, path in enumerate(self.paths):
                 with open(path) as f:
-                    for i, l in enumerate(f.read().splitlines()):
+                    for i, l in enumerate(utils.safe_splitlines(f.read())):
                         new_paths.append(path)
                         new_text.append(l)
                         new_lines.append(i+1)

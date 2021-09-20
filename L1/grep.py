@@ -182,8 +182,8 @@ class Parsing(object):
         return self.__split_line(line)
 
     def parse_with_func_ctx(self, output, output_colored):
-        res = output.splitlines()
-        res_colored = output_colored.splitlines()
+        res = utils.safe_splitlines(output)
+        res_colored = utils.safe_splitlines(output_colored)
         parsed = SearchResult()
         self.cur_file = None
 
