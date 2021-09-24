@@ -14,4 +14,5 @@ RUN git clone https://github.com/gofri/gofritools.git ${BRANCH}
 RUN git config --global pull.rebase true
 RUN git config --global pull.ff false
 
-ADD default_gofignore /.gofignore
+WORKDIR /
+COPY gofignore .gofignore
