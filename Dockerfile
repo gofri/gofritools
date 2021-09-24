@@ -13,6 +13,3 @@ ENV PATH=$PATH:/gofritools
 RUN git clone https://github.com/gofri/gofritools.git ${BRANCH}
 RUN git config --global pull.rebase true
 RUN git config --global pull.ff false
-
-WORKDIR /
-COPY gofignore .gofignore
