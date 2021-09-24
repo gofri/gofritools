@@ -14,6 +14,18 @@ def common_pattern_parser_partial():
                                 action='count', default=0)
     return common_pattern
 
+
+
+def post_process_excludes(namespace):
+    # XXX: unfortunately, there is no such concept of entangled args,
+    #      so in order to make --gofignore & --exclude-files function with all combinations,
+    #      we shall resort to post processing the namespace instead of using Action on the arg level,
+    #      since the desired behavior is on a multi-arg level.
+    files = namespace.exclude_files or []
+    path = namespace.gofignore
+    gofs = utils.get_ignore_list(path)
+    namespace.exclude_files = files + gofs
+
 def common_pattern_parser():
     ''' Common flags for cmds with a pattern '''
     common_pattern = common_pattern_parser_partial()
@@ -24,7 +36,10 @@ def common_pattern_parser():
     common_pattern.add_argument(
         '-w', '--whole-word', help='grep for whole word', action='store_true', default=False)
 
-    common_pattern.add_argument('--exclude-files', nargs='*', type=str, default=['.*pdf$', '^(\./)?vendor/.*'])
+    # note: see post_process_excludes
+    common_pattern.add_argument('--gofignore', help='path to a non-default gofignore', type=Docker().outside_to_inside, default=None)
+    common_pattern.add_argument('--exclude-files', nargs='*', type=str, default=None)
+
     return common_pattern
 
 def common_file_line_parser():

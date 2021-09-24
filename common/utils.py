@@ -133,23 +133,11 @@ def get_func_args(func):
     return inspect.getfullargspec(func).args
 
 
-DEFAULT_GOFRITOOLS_DIR = os.path.expanduser('~/.gofritools/')
-
-def __real_get_ignore_list(ignore_file=None):
+def get_ignore_list(ignore_file=None):
     DEFAULT_IGNORE_FILE = '.gofignore'
-    if ignore_file is None:
-        ignore_file = os.path.join(DEFAULT_GOFRITOOLS_DIR, DEFAULT_IGNORE_FILE)
-    try:
-        with open(ignore_file, 'r') as f:
-            return f.read().splitlines()
-    except Exception as e:
-        return []
-
-g_ignore_list = SimpleCache(__real_get_ignore_list)
-
-def get_ignore_list():
-    global g_ignore_list
-    return g_ignore_list.fetch()
+    ignore_file = ignore_file or DEFAULT_IGNORE_FILE
+    with open(ignore_file, 'r') as f:
+        return f.read().splitlines()
 
 def should_ignore_record(record):
     ''' returns ignored path if should be ignored, None otherwise. '''

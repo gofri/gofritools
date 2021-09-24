@@ -15,21 +15,32 @@ import copy
 from L1.find import join_suffix
 
 class BasicFilter(object):
-    def __init__(self, pattern, wildness, case_sensitive, whole_word, invert, **ignorable):
+    def __init__(self, pattern, wildness, case_sensitive, whole_word, invert, exclude_files, **ignorable):
         self.pattern = pattern
         self.wildness = wildness
         self.case_sensitive = case_sensitive
         self.whole_word = whole_word
         self.invert = invert
         self.compiled = self.compile(self.pattern)
+        self.exclude_files = exclude_files
 
-    def match(self, *args, **kwargs):
+    def match(self, data):
         raise NotImplementedError()
+
+    def should_ignore_file(self, path):
+    # TODO this is duplicate with grep's ignoring
+        def test(e):
+            try:
+                return re.match(e, file)
+            except re.error as e:
+                raise Exception(f'invalid regex: {e}')
+        return any(map(test, self.exclude_files))
+
 
     def on_empty_pattern(self, virt_filter):
         return copy.deepcopy(virt_filter.prev_output)
 
-    def post_did_match(self, *args, **kwargs):
+    def post_did_match(self, index, data, virt_filter):
         pass
 
     @classmethod
@@ -88,11 +99,11 @@ class TextFilter(BasicFilter):
         return pattern or ['.*']
 ###
 
-class Filteree(Enum):
+class FilteredType(Enum):
     TEXT = auto()
     PATH = auto()
     
-    def get_relevant_filteree(self, text, paths):
+    def get_relevant_filtered_type(self, text, paths):
         options = {self.TEXT:text, self.PATH:paths}
         return options[self]
     
@@ -108,9 +119,9 @@ class Filteree(Enum):
 ###
 
 class VirtualFilter(IVirt):
-    def __init__(self, filteree: Filteree, *args, **kwargs):
+    def __init__(self, filtered_type: FilteredType, *args, **kwargs):
         IVirt.__init__(self, *args, **kwargs)
-        self.filteree = filteree
+        self.filtered_type = filtered_type
 
     def text_colored_or_text(self, index):
         if self.text_colored[index]:
@@ -124,7 +135,7 @@ class VirtualFilter(IVirt):
         self.paths = self.prev_output.paths
         self.lines = self.prev_output.lines
 
-        if self.filteree == Filteree.TEXT and not any(self.text):
+        if self.filtered_type == FilteredType.TEXT and not any(self.text):
             new_text = []
             new_lines = []
             new_paths = []
@@ -145,16 +156,16 @@ class VirtualFilter(IVirt):
         res = SearchResult()
 
         self.__prepare_filtering()
-        pattern = self.filteree.get_filter_type().default_pattern(pattern)
-        filteree = self.filteree.get_relevant_filteree(text=self.text, paths=self.paths)
+        pattern = self.filtered_type.get_filter_type().default_pattern(pattern)
+        filtered_type = self.filtered_type.get_relevant_filtered_type(text=self.text, paths=self.paths)
 
         # if pattern == []:
-        #    return self.filteree.on_empty_pattern(self)
+        #    return self.filtered_type.on_empty_pattern(self)
 
-        for i, t in enumerate(filteree):
+        for i, t in enumerate(filtered_type):
             any_pattern = False
             for p in pattern:
-                _filter = self.filteree.get_filter(p, **ignorable)
+                _filter = self.filtered_type.get_filter(p, **ignorable)
                 if _filter.match(t):
                     any_pattern = True
                     _filter.post_did_match(i, t, self)

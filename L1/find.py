@@ -49,9 +49,10 @@ class Find(IProgram):
         files_to_search = self.__get_files_to_search(files)
         exclude_files = exclude_files or []
 
-        matches = self.get_expressions(regex, pattern, suffix, invert, invert_suffix, whole_word, wildness)
+        matches = self.get_expressions(regex, pattern, suffix, invert, invert_suffix, wildness, whole_word)
 
-        exclude_files = [ [regex, f] for f in exclude_files ]
+        exclude_files_op = '-regex'
+        exclude_files = [ [exclude_files_op, f] for f in exclude_files ]
         excludes = self.get_excludes(exclude_files)
         if excludes:
             matches = excludes + [self.AND] + matches

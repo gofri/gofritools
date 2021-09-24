@@ -10,6 +10,7 @@ import shlex
 import readline
 import argcomplete
 import os
+from L1.lower.argparse import post_process_excludes
 
 ''' DEPRECATED: started moving to each prog '''
 def add_sub_parser(p, kv_dict, /, *args, aliases, **kwargs):
@@ -145,6 +146,7 @@ def make_parser(interactive=False, virt=False, input_data=None):
 def parse_args(parser, cmdline=None):
     args = parser.parse_args(cmdline)
 
+    post_process_excludes(args)
     # TODO use a standard count positive+negative
     args.verbosity -= args.no_verbosity
     del args.no_verbosity

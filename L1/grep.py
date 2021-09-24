@@ -10,6 +10,7 @@ import itertools
 from L0.ishell import IShell
 from L1.lower.argparse import common_pattern_parser
 from common import ui_tools
+import re
 
 GREP_RC_NO_RES = 1
 
@@ -23,7 +24,7 @@ class Grep(IProgram):
     CALLER_SEPARATOR = '='
     
     def _run_prog(self, **kwargs):
-        kwargs['pattern'] = kwargs['pattern'] or '.*'
+        kwargs['pattern'] = kwargs['pattern'] or ['.*']
         no_color = self.__grep_base_no_color(**kwargs)
         colored = self.__grep_base_colored(**kwargs)
 
@@ -57,12 +58,8 @@ class Grep(IProgram):
         extra_flags = extra_flags or ''
         untracked = '--untracked' if untracked else ''
 
-        if exclude_files:
-            # https://ask.xiaolee.net/questions/1085445
-            exclude_files = [f':(exclude){x}' for x in exclude_files]
-            # exclude in git is practically just a native hack of files specification
-            files += exclude_files
-
+	# XXX: git grep has a hackish exclude-files functionality,
+	#	do that in post-processing instead (but keep as arg for arg-processing sake)
         pattern = list(itertools.chain(*[('-e', p) for p in pattern]))
 
         util = self.__get_util(git)
@@ -96,8 +93,8 @@ class Grep(IProgram):
             # Force no-index (e.g. when running from a repo but searching outside the repo)
             return 'git grep --no-index'
 
-    def __parse_output(self, output, output_colored, *args, **kwargs):
-        return Parsing().parse_with_func_ctx(output, output_colored)
+    def __parse_output(self, output, output_colored, *args, exclude_files, **kwargs):
+        return Parsing(exclude_files).parse_with_func_ctx(output, output_colored)
 
     @classmethod
     def arg_parser(cls, parent):
@@ -143,12 +140,14 @@ class ParsedLine(object):
 
 class Parsing(object):
 
-    def __init__(self):
+    def __init__(self, exclude_files):
         self.cur_file = None
         self.post_match = False
         self.in_res = False
         self.pre_ctx = []
         self.caller = []
+        self.exclude_files = exclude_files
+	
 
     def __split_line(self, line):
         indices = {s:index for s in InlineSeparator if (index:=line.find(s.value)) != -1}
@@ -179,6 +178,15 @@ class Parsing(object):
         
         return self.__split_line(line)
 
+    def should_ignore_file(self, file):
+    	# TODO this is duplicate with virt_filter
+        def test(e):
+            try:
+                return re.match(e, file)
+            except re.error as e:
+                raise Exception(f'invalid regex: {e}')
+        return any(map(test, self.exclude_files))
+
     def parse_with_func_ctx(self, output, output_colored):
         res = utils.safe_splitlines(output)
         res_colored = utils.safe_splitlines(output_colored)
@@ -207,6 +215,8 @@ class Parsing(object):
             if sep == InlineSeparator.DECLARATION_OR_USAGE:
                 is_decl = not self.in_res
                 text_colored = self.__get_colored_text(res_colored[i])
+                if self.should_ignore_file(self.cur_file):
+                    continue # apply excluded files
                 if any([self.cur_file.endswith('.c'), self.cur_file.endswith('.h')]): # heuristic: only for c
                     if self.caller and self.caller[1].strip().startswith('struct'): # herusitic: if within struct, this is a defintion
                         is_decl = True
