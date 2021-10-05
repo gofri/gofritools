@@ -136,6 +136,7 @@ def get_func_args(func):
 def get_ignore_list(ignore_file=None):
     DEFAULT_IGNORE_FILE = '.gofignore'
     ignore_file = ignore_file or DEFAULT_IGNORE_FILE
+    ignore_file = ignore_file if os.path.exists(ignore_file) else '/gofritools/' + ignore_file
     with open(ignore_file, 'r') as f:
         return f.read().splitlines()
 
