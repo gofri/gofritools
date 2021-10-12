@@ -15,14 +15,16 @@ def common_pattern_parser_partial():
     return common_pattern
 
 
+def namespace_get(ns, *args, **kwargs):
+    return vars(ns).get(*args, **kwargs)
 
 def post_process_excludes(namespace):
     # XXX: unfortunately, there is no such concept of entangled args,
     #      so in order to make --gofignore & --exclude-files function with all combinations,
     #      we shall resort to post processing the namespace instead of using Action on the arg level,
     #      since the desired behavior is on a multi-arg level.
-    files = namespace.exclude_files or []
-    path = namespace.gofignore
+    files = namespace_get(namespace, 'exclude_files', []) or []
+    path = namespace_get(namespace, 'gofignore', []) or []
     gofs = utils.get_ignore_list(path)
     namespace.exclude_files = files + gofs
 
