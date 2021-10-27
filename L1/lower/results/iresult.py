@@ -35,16 +35,16 @@ class IFileLinable(IResult):
         pass
 
 class IOutputable(IResult):
-    def jsonize(self):
+    def jsonize(self, *args, **kwargs):
         pass
 
-    def humanize(self):
+    def humanize(self, *args, **kwargs):
         pass
 
-    def raw_text(self):
+    def raw_text(self, *args, **kwargs):
         pass
 
-    def picklize(self):
+    def picklize(self, *args, **kwargs):
         pass
 
     def stringify_by_args(self, **kwargs):

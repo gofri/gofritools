@@ -68,7 +68,7 @@ class Stringification(object):
 
 
         max_size = kwargs.get('max_line_size')
-        if len(text) > max_size:
+        if max_size and len(text) > max_size:
             warning = ui_tools.colored(f'<Warning [from gofritools]: the text above is truncated from {len(text)} to {max_size} chars>', color='red')
             text = text[:max_size] + '\n' + warning
         return text, context, break_before
@@ -83,7 +83,7 @@ class Stringification(object):
         return ui_tools.colored(text, key=key)
 
     @classmethod
-    def raw_text(cls, data, prev_context=None):
+    def raw_text(cls, data, prev_context=None, **kwargs):
         ''' for multiple records '''
         res = ''
         prev_context = prev_context or ''

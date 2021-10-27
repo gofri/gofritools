@@ -133,10 +133,18 @@ def get_func_args(func):
     return inspect.getfullargspec(func).args
 
 
+DEFAULT_IGNORE_FILE = '.gofignore'
+
+def __default_gofignore():
+    from subprocess import check_output as run
+    repo = run(f'git rev-parse --show-toplevel', cwd=os.path.dirname(__file__), encoding='utf-8', shell=True).strip()
+    global DEFAULT_IGNORE_FILE
+    return os.path.join(repo, DEFAULT_IGNORE_FILE)
+
 def get_ignore_list(ignore_file=None):
-    DEFAULT_IGNORE_FILE = '.gofignore'
-    ignore_file = ignore_file or DEFAULT_IGNORE_FILE
-    ignore_file = ignore_file if os.path.exists(ignore_file) else '/gofritools/' + ignore_file
+    default = __default_gofignore()
+    ignore_file = ignore_file or default
+    ignore_file = ignore_file if os.path.exists(ignore_file) else f'/gofritools/{default}'
     with open(ignore_file, 'r') as f:
         return f.read().splitlines()
 
