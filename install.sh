@@ -46,6 +46,15 @@ main() {
     # Install path
     if ! test -d "$INSTALL_DIR"; then
         INSTALL_DIR='/usr/bin/'
+        if test $UID -ne 0; then
+            echo "no user-local path, please run as sudo"
+            exit 1
+        fi
+    fi
+
+    if test -z "$(echo $PATH | grep -q $INSTALL_DIR)"; then
+        echo "effective install dir ($INSTALL_DIR) is not in path. please provide an alternative."
+        exit 1
     fi
 
     # Engine discovery
