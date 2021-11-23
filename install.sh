@@ -11,6 +11,8 @@ PULL_REPO=${PULL_REPO:-1}
 
 LOCAL_SHORTCUTS_ONLY=${LOCAL_SHORTCUTS_ONLY:-0}
 
+# TODO do not try to install docker -- require already-installed instead
+
 try_install_docker() {
     if grep -qi 'red hat' /etc/os-release; then
         sudo yum install -y podman && return 0
@@ -40,20 +42,23 @@ get_docker_engine() {
     get_installed_engine || (try_install_docker && get_installed_engine)
 }
 
+validate_install_dir() {
+    local d=$1
+    if ! echo $PATH | grep -q $d; then
+        echo "effective install dir ($d) is not in path. please provide an alternative."
+        return 1
+    fi
+    
+    mkdir -p $d
+    return 0
+}
+
 main() {
     set -x
+    set -e
 
     # Install path
-    if ! test -d "$INSTALL_DIR"; then
-        INSTALL_DIR='/usr/bin/'
-        if test $UID -ne 0; then
-            echo "no user-local path, please run as sudo"
-            exit 1
-        fi
-    fi
-
-    if test -z "$(echo $PATH | grep -q $INSTALL_DIR)"; then
-        echo "effective install dir ($INSTALL_DIR) is not in path. please provide an alternative."
+    if ! validate_install_dir $INSTALL_DIR; then
         exit 1
     fi
 
@@ -68,9 +73,11 @@ main() {
 
         # Cleanup
         echo "cleanup:"
+        (
         $engine stop ${CONTAINER_NAME}
         $engine rm ${CONTAINER_NAME}
         $engine rmi ${IMAGE_NAME}
+        ) || true
 
         # Build
         if test $PULL_DOCKERHUB -eq 1 && ${engine} pull ${DOCKERHUB_IMAGE}:latest; then
