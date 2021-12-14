@@ -174,7 +174,7 @@ class Find(IProgram):
                                             common_pattern_parser()], help='find operations')
         suffix_options = find_parser.add_mutually_exclusive_group()
         suffix_options.add_argument('-s', '--suffix', nargs='*', type=str, help='File extension (e.g. cpp, py)', default=[
-                                    'py', 'c', 'cpp', 'cc', 'h', 'hpp', 'java', 'md', 'jinja', 'jinja2', 'json', 'rpm', 'sh', 'text', 'txt', 'go', 'js'])
+                                    'py', 'c', 'cpp', 'cc', 'h', 'hpp', 'java', 'md', 'jinja', 'jinja2', 'json', 'rpm', 'sh', 'text', 'txt', 'go', 'js', 'ts'])
         # TODO add invert-search for file extension (exclusive group with suffix):
         #   * combinations: (of --invert, --suffix, --invert-suffix)
         #   1. pattern without --invert [regular search]

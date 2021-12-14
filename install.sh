@@ -14,7 +14,7 @@ LOCAL_SHORTCUTS_ONLY=${LOCAL_SHORTCUTS_ONLY:-0}
 # TODO do not try to install docker -- require already-installed instead
 
 try_install_docker() {
-    if grep -qi 'red hat' /etc/os-release; then
+    if grep -qi -e 'red hat' -e 'fedora' /etc/os-release; then
         sudo yum install -y podman && return 0
     else
         sudo apt install -y docker && return 0
@@ -112,11 +112,11 @@ main() {
     kill_script="${engine} rm ${CONTAINER_NAME}"
     __exec_script="if test -p /dev/stdin; then mode='-t'; else mode='-it'; fi; ${engine} exec \${mode} --workdir /mnt/root\$(pwd) ${CONTAINER_NAME}"
     exec_script="${__exec_script} gofritools \"\$@\""
-    chmod +x "${UTIL}"
 
     (
         cd $INSTALL_DIR
         echo "$exec_script" > "${UTIL_NAME}"
+        chmod +x "${UTIL}"
         echo "if test -p /dev/stdout; then mode=p; else mode=b; fi; ${UTIL_NAME} \${mode} \"\$@\"" > gof
         echo "${UTIL_NAME} i \"\$@\"" > gofi
         echo "${UTIL_NAME} i g \"\$@\"" > gg
