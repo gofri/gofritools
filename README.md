@@ -26,9 +26,11 @@ __A set of tools for working and investigating code.__
 
 ## Docker quick install
 wget -O - https://raw.githubusercontent.com/gofri/gofritools/master/install.sh | bash
-Or alternatively using the shortened URL:
-wget -O - https://git.io/JqxIH | bash
 
+NOTE:
+	for mac, use mac_install.sh. You also need:
+	- xquartz up and running + enable network connection
+	- add / to Docker-Desktop file sharing
 ###
 
 ## General TODOs:
