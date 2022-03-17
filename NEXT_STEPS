@@ -1,0 +1,20 @@
+NOTE: deliberately waiting with JQL - it's not so easy to implement & stability is more important & 
+NOTE: need to wrap my head around Result types (already wip) so that fixing testing for git results will not be too complex
+
+0. README: remove trash and adjust to changes
+1. Installation:
+	* make gofritools docker-based only
+	* do not try to install anything - just require docker/podman to be installed
+	* consider a better installation_dir choice algorithm 
+	* unite install & mac_install and detect automatically
+2. grep/find:
+	* Define the interface and behavior (there is already one in place, but no bullet-proof, and probably not perfectly implemented in all cases) 
+3. Testing:
+	cannot really continue progress without testing...
+	* add testing to batch-mode first, interactive is non-trivial
+	* add testing layer-by-layer
+	* consider pytest with setup scripts for vectors (files for search and content, patterns, git repo, etc.)
+4. upper layers:
+	* improve stack/pipe system to work with multi-stacks
+	* add export/import for stacks to save searches etc.
+
